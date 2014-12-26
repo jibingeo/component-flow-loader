@@ -1,12 +1,28 @@
-body{
+
+
+
+.rotate-wrapper-perspective{
     -webkit-transform-origin: 0;
     -webkit-perspective: 700px;
     -webkit-perspective-origin-x: 400px;
 }
 
 
-#todoapp{
+
+/*Generalize to a selctor for the top level element*/
+
+
+.rotate-wrapper{
     transform-style: preserve-3d;
-    -webkit-transform: rotatey(21deg);
+    -webkit-transition: -webkit-transform 0.8s ease;
+
 }
 
+.rotate-controls{
+    position: fixed;
+    top:30px;
+    right:30px;
+    background: #fff;
+    height: 100px;
+    width: 100px;
+}

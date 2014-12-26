@@ -125,9 +125,36 @@ function isRenderMethodProperty(node){
 }
 
 
+//React.render(<TopLevelComponent />)
+function isTopLevelAPIRender(node){
+  return (node.type === 'CallExpression' &&
+  node.callee.type === 'MemberExpression' &&
+  node.callee.object.name === 'React' &&
+  node.callee.property.name === 'render')
+}
 
 
 
+
+/*
+function returnValue(r, resultIdentifier) {
+  return {
+    type: 'BlockStatement',
+    body: [{
+      type: 'ExpressionStatement',
+      expression: {
+        type: 'AssignmentExpression',
+        operator: '=',
+        left: resultIdentifier,
+        right: r.argument
+      }
+    }, {
+      type: 'BreakStatement',
+      label: tcoLabel
+    }]
+  };
+}
+*/
 
 
 
@@ -161,21 +188,66 @@ function tranformFile(source){
       //**** AST Scan/collect functions ******
 
 
+
+
+      if(isTopLevelAPIRender(node)){
+
+        var wrapped = {
+          "type": "CallExpression",
+          "callee": {
+            "type": "MemberExpression",
+            "computed": false,
+            "object": {
+              "type": "Identifier",
+              "name": "React"
+            },
+            "property": {
+              "type": "Identifier",
+              "name": "createElement"
+            }
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "RotateWrapper"
+            },
+            {
+              "type": "Literal",
+              "value": null
+            },
+            _.cloneDeep(node.arguments[0])
+          ]
+        };
+
+
+        node.arguments[0] = wrapped;
+
+        console.log(escodegen.generate(node));
+
+
+        this.skip();
+        return node;
+
+      }
+
+
       //Going to traverse the component declaration subtree --
       //create a new object to store the owned child components that will get traversed
       if(isComponentDeclaration(node)){
 
         curComponent = node.declarations[0].id.name;
-        console.log(node.declarations[0].id.name)
+       // console.log(node.declarations[0].id.name)
       }
+
+
 
       if(isCreateCustomElementCall(node)){
         var cName = node.arguments[0].name;
 
 
-        console.log("CUSTOM COMPONENT: " + cName);
+       // console.log("CUSTOM COMPONENT: " + cName);
 
-        console.log(node);
+       // console.log(node);
 
 
         var wrapped = {
@@ -198,8 +270,46 @@ function tranformFile(source){
                 "value": "div"
               },
               {
-                "type": "Literal",
-                "value": null
+                "type": "ObjectExpression",
+                "properties": [
+                  {
+                    "type": "Property",
+                    "key": {
+                      "type": "Identifier",
+                      "name": "style"
+                    },
+                    "value": {
+                      "type": "ObjectExpression",
+                      "properties": [
+                        {
+                          "type": "Property",
+                          "key": {
+                            "type": "Identifier",
+                            "name": "border"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": "1px solid green"
+                          },
+                          "kind": "init"
+                        },
+                        {
+                          "type": "Property",
+                          "key": {
+                            "type": "Identifier",
+                            "name": "transform"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "value": cName === 'TodoItem' ? "translateZ("+ Math.random() * 200  +"px)" :"",
+                          },
+                          "kind": "init"
+                        }
+                      ]
+                    },
+                    "kind": "init"
+                  }
+                ]
               },
               {
                 "type": "Literal",
@@ -214,6 +324,8 @@ function tranformFile(source){
 
 
       }
+
+
 
       if(isPropsMemberExpression(node)){
         var usedPropName = node.property.name;
@@ -319,6 +431,7 @@ module.exports = function(content) {
 
 
   var cssPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/style.css';
+  var jsPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
 
 
   if (!/node_modules/.test(this.context)){
@@ -331,25 +444,11 @@ module.exports = function(content) {
 
 
     if( _.any(entryPaths, function(e){ return resourcePath.indexOf(e.replace(".", "")) !== -1 })){
-      return  'require("style-loader!css-loader!'+ cssPath +'"); \n\n' + tranformFile(content);
+      return  'var RotateWrapper = require("'+ jsPath +'");    require("style-loader!css-loader!'+ cssPath +'"); \n\n' + tranformFile(content);
     }
     else{
       return tranformFile(content);
     }
-
-
-
-
-    //Need to get these styles on the body for the transform
-
-
-    /*-webkit-perspective: 700px;
-     -webkit-perspective-origin-x: 400px;*/
-
-
-
-    //Transforms can also go on the top level app for rotation with the mouse
-    /*-webkit-transform: rotatey(30deg);*/
 
 
 
