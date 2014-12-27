@@ -190,6 +190,7 @@ function tranformFile(source){
 
 
 
+      //Wrap top level component in RotateWrapper component
       if(isTopLevelAPIRender(node)){
 
         var wrapped = {
@@ -249,7 +250,7 @@ function tranformFile(source){
 
        // console.log(node);
 
-
+/*
         var wrapped = {
             "type": "CallExpression",
             "callee": {
@@ -319,12 +320,80 @@ function tranformFile(source){
             ]
         };
 
+
+*/
+
+        var createElNode = _.cloneDeep(node);
+
+
+        var propNode = {
+          "type": "ObjectExpression",
+          "properties": [
+            {
+              "type": "Property",
+              "key": {
+                "type": "Identifier",
+                "name": "passedProps"
+              },
+              "value": createElNode.arguments[1],
+              "kind": "init"
+            },
+            {
+              "type": "Property",
+              "key": {
+                "type": "Identifier",
+                "name": "wrappedComponentName"
+              },
+              "value": {
+                "type": "Literal",
+                "value": cName,
+              },
+              "kind": "init"
+            },
+            {
+              "type": "Property",
+              "key": {
+                "type": "Identifier",
+                "name": "ownerName"
+              },
+              "value": {
+                "type": "Literal",
+                "value": curComponent,
+              },
+              "kind": "init"
+            }
+          ]
+        };
+
+
+        var wrapped = {
+          "type": "CallExpression",
+          "callee": {
+            "type": "MemberExpression",
+            "computed": false,
+            "object": {
+              "type": "Identifier",
+              "name": "React"
+            },
+            "property": {
+              "type": "Identifier",
+              "name": "createElement"
+            }
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "ComponentWrapper"
+            },
+            propNode,
+            createElNode
+          ]
+        };
+
         this.skip();
         return wrapped;
 
-
       }
-
 
 
       if(isPropsMemberExpression(node)){
@@ -431,8 +500,8 @@ module.exports = function(content) {
 
 
   var cssPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/style.css';
-  var jsPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
-
+  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
+  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
 
   if (!/node_modules/.test(this.context)){
 
@@ -444,7 +513,7 @@ module.exports = function(content) {
 
 
     if( _.any(entryPaths, function(e){ return resourcePath.indexOf(e.replace(".", "")) !== -1 })){
-      return  'var RotateWrapper = require("'+ jsPath +'");    require("style-loader!css-loader!'+ cssPath +'"); \n\n' + tranformFile(content);
+      return  'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("style-loader!css-loader!'+ cssPath +'"); \n\n' + tranformFile(content);
     }
     else{
       return tranformFile(content);

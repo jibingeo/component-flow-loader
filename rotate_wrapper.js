@@ -25,12 +25,12 @@ var RotateWrapper = React.createClass({
 
   render: function () {
 
-    var transformString = {"-webkit-transform": "rotatey(" + this.state.y + "deg)"}
+    var transformString = {"transform": "rotatey(" + this.state.y + "deg)"}
 
     return (
 
       <div>
-        <div className="rotate-wrapper-perspective">
+        <div className="viewport">
           <div className="rotate-wrapper" style={transformString}>
             {this.props.children}
           </div>

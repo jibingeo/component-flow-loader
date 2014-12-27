@@ -1,21 +1,14 @@
 
 
+.viewport{
 
-.rotate-wrapper-perspective{
-    -webkit-transform-origin: 0;
-    -webkit-perspective: 700px;
-    -webkit-perspective-origin-x: 400px;
+    perspective: 700px;
+    perspective-origin-x: 50% 200px;
 }
-
-
-
-/*Generalize to a selctor for the top level element*/
-
 
 .rotate-wrapper{
     transform-style: preserve-3d;
     -webkit-transition: -webkit-transform 0.8s ease;
-
 }
 
 .rotate-controls{
@@ -25,4 +18,10 @@
     background: #fff;
     height: 100px;
     width: 100px;
+}
+
+
+.component-wrapper{
+    transform-style: preserve-3d;
+    border: 1px solid green;
 }
