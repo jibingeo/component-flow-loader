@@ -242,7 +242,7 @@ function tranformFile(source){
 
 
 
-      if(isCreateCustomElementCall(node)){
+      if(isCreateCustomElementCall(node) && node.arguments[0].name !== 'CSSTransitionGroup'){
         var cName = node.arguments[0].name;
 
 
@@ -250,81 +250,7 @@ function tranformFile(source){
 
        // console.log(node);
 
-/*
-        var wrapped = {
-            "type": "CallExpression",
-            "callee": {
-              "type": "MemberExpression",
-              "computed": false,
-              "object": {
-                "type": "Identifier",
-                "name": "React"
-              },
-              "property": {
-                "type": "Identifier",
-                "name": "createElement"
-              }
-            },
-            "arguments": [
-              {
-                "type": "Literal",
-                "value": "div"
-              },
-              {
-                "type": "ObjectExpression",
-                "properties": [
-                  {
-                    "type": "Property",
-                    "key": {
-                      "type": "Identifier",
-                      "name": "style"
-                    },
-                    "value": {
-                      "type": "ObjectExpression",
-                      "properties": [
-                        {
-                          "type": "Property",
-                          "key": {
-                            "type": "Identifier",
-                            "name": "border"
-                          },
-                          "value": {
-                            "type": "Literal",
-                            "value": "1px solid green"
-                          },
-                          "kind": "init"
-                        },
-                        {
-                          "type": "Property",
-                          "key": {
-                            "type": "Identifier",
-                            "name": "transform"
-                          },
-                          "value": {
-                            "type": "Literal",
-                            "value": cName === 'TodoItem' ? "translateZ("+ Math.random() * 200  +"px)" :"",
-                          },
-                          "kind": "init"
-                        }
-                      ]
-                    },
-                    "kind": "init"
-                  }
-                ]
-              },
-              {
-                "type": "Literal",
-                "value": cName +" OWNED BY " + curComponent
-              },
-              node
-            ]
-        };
-
-
-*/
-
         var createElNode = _.cloneDeep(node);
-
 
         var propNode = {
           "type": "ObjectExpression",
@@ -499,9 +425,9 @@ module.exports = function(content) {
     filename = path.basename(resourcePath);
 
 
-  var cssPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/style.css';
-  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
-  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
+  var cssPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/style.css';
+  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
+  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
 
   if (!/node_modules/.test(this.context)){
 
@@ -509,11 +435,13 @@ module.exports = function(content) {
     console.log("FILE: ", filename);
 
     //Parse out all potential app entry points
-    var entryPaths = getEntryArray(this.options.entry);
+    var entryPaths = !_.isPlainObject(this.options.entry) ?
+      getEntryArray(this.options.entry) :
+      _(this.options.entry).map(function(val, key){ return getEntryArray(val); }).flatten().value();
 
 
     if( _.any(entryPaths, function(e){ return resourcePath.indexOf(e.replace(".", "")) !== -1 })){
-      return  'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("style-loader!css-loader!'+ cssPath +'"); \n\n' + tranformFile(content);
+      return  'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("'+ cssPath +'"); \n\n' + tranformFile(content);
     }
     else{
       return tranformFile(content);

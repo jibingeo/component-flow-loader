@@ -1,7 +1,4 @@
-
-
 .viewport{
-
     perspective: 700px;
     perspective-origin-x: 50% 200px;
 }
@@ -23,5 +20,4 @@
 
 .component-wrapper{
     transform-style: preserve-3d;
-    border: 1px solid green;
 }

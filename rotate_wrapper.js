@@ -23,9 +23,11 @@ var RotateWrapper = React.createClass({
   },
 
 
+  //translate3d(0, 0, 1000px)
+
   render: function () {
 
-    var transformString = {"transform": "rotatey(" + this.state.y + "deg)"}
+    var transformString = {"transform": "rotatey(" + this.state.y + "deg) translate3d(0, 0, -500px)"}
 
     return (
 
