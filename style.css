@@ -1,4 +1,5 @@
 
+
 .viewport{
     perspective: 700px;
     perspective-origin-x: 50% 200px;
@@ -9,14 +10,6 @@
     -webkit-transition: -webkit-transform 0.8s ease;
 }
 
-.rotate-controls{
-    position: fixed;
-    top:30px;
-    right:30px;
-    background: #fff;
-    height: 100px;
-    width: 100px;
-}
 
 
 .component-wrapper{
@@ -24,12 +17,43 @@
     transform-style: preserve-3d;
 }
 
+
+
+
+
 .meta-panel{
-    left:100px;
+    right: -215px;
     position: absolute;
     border: 1px solid #ccc;
 }
 
+
+
+
+
+
+.data-log-panel{
+    top: 0px;
+    right: 0px;
+    overflow-y: scroll;
+    padding: 10px;
+    position: fixed;
+    width: 22%;
+    height: 100%;
+    background-color: white;
+}
+
+
+
+
+.rotate-controls{
+    position: fixed;
+    left:30px;
+    bottom:30px;
+    background: #fff;
+    height: 100px;
+    width: 100px;
+}
 
 .left {
     position: absolute;
@@ -54,4 +78,11 @@
     position: absolute;
     right: 33%;
     bottom: 0;
+}
+
+
+.toggle-view{
+    position: absolute;
+    left: 4%;
+    top: -35%;
 }

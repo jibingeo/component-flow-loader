@@ -492,8 +492,14 @@ module.exports = function(content) {
       _(this.options.entry).map(function(val, key){ return getEntryArray(val); }).flatten().value();
 
 
+    //Return instrumented entry module that includes things needed for the components injected at runtime
     if( _.any(entryPaths, function(e){ return resourcePath.indexOf(e.replace(".", "")) !== -1 })){
-      return 'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("'+ cssPath +'"); \n\n' + tranformFile(content);
+      return ['window.ComponentWrapper = require("'+componentWrapperPath+'");',
+              'window.RotateWrapper = require("'+ rotateWrapperPath +'");',
+              'var EventEmitter = require("events").EventEmitter;',
+              'window.__DDL_EE__ = new EventEmitter();',
+              'require("'+ cssPath +'");' ,
+              tranformFile(content)].join('\n\n');
     }
     else{
       return tranformFile(content);

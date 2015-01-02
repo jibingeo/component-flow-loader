@@ -10,7 +10,7 @@ var ComponentWrapper = React.createClass({
   getInitialState: function(){
     return {
       didChange: false,
-      color: 'green',
+      border: null,
       top: null,
       left: null,
       right: null,
@@ -18,6 +18,8 @@ var ComponentWrapper = React.createClass({
       position: null
     };
   },
+
+
 
   componentDidMount: function(){
     /*
@@ -54,6 +56,7 @@ var ComponentWrapper = React.createClass({
     window.cp = window.cp || [];
 
 
+
     if(this.props.wrappedComponentName === 'MainSection'){
 
 
@@ -67,17 +70,29 @@ var ComponentWrapper = React.createClass({
 
     if(!_.isEqual(nextProps.passedProps,this.props.passedProps)){
 
+
+
       if(this.isMounted()) {
-        this.setState({didChange: true, color: 'red'});
+        this.setState({didChange: true, border: '1px solid red'});
       }
 
       setTimeout(function(){
         if(this.isMounted()){
-          this.setState({didChange: false, color: 'green'});
+          this.setState({didChange: false, border: null});
         }
 
 
-      }.bind(this), 100000000);
+      }.bind(this), 500);
+
+
+
+      //TODO: this._rootNodeID is the id you can use to select the backing dom node and retrive it like this
+      //document.querySelector('[data-reactid=".0.0.0.0.0.0.1.0"]')
+      //make sure to emit that here so the data panel can pick it up
+
+      window.__DDL_EE__.emit("data", this.props.wrappedComponentName, nextProps.passedProps);
+
+
     }
 
   },
@@ -95,22 +110,12 @@ var ComponentWrapper = React.createClass({
       <div className="component-wrapper" style={{
         "transform": "translateZ("+ z * .05  +"px)",
         "height": this.state.height,
-        "border": "1px solid " + this.state.color,
+        "border": this.state.border,
         "top": this.state.top,
         "left": this.state.left,
         "right": this.state.right,
         "bottom": this.state.bottom,
         "position": this.state.position}}>
-
-
-          {this.state.didChange ?
-            <div className="meta-panel">
-              <h3>{this.props.wrappedComponentName}</h3>
-
-              <pre>{JSON.stringify(this.props.passedProps, null, 2)} </pre>
-            </div>
-
-            : null  }
 
         {child}
 

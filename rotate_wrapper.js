@@ -2,10 +2,13 @@
 var React = require('react');
 
 
+var DataLogPanel = require('./data_log_panel');
+
 var RotateWrapper = React.createClass({
 
   getInitialState: function(){
     return {
+      is3DView: false,
       rotationVector: [0,0,0],
       translationVector: [0,0,-500]
     }
@@ -42,9 +45,12 @@ var RotateWrapper = React.createClass({
 
   },
 
+  toggleViewMode: function(){
+    this.setState({
+      is3DView: !this.state.is3DView
+    });
+  },
 
-
-  //translate3d(0, 0, 1000px)
 
   render: function () {
 
@@ -53,22 +59,28 @@ var RotateWrapper = React.createClass({
     return (
 
       <div>
-        <div className="viewport">
-          <div className="rotate-wrapper" style={transformString}>
+        <div className={this.state.is3DView ? "viewport" : null}>
+          <div className="rotate-wrapper" style={this.state.is3DView ? transformString: null}>
             {this.props.children}
           </div>
         </div>
 
+
+
         <div className="rotate-controls">
-
-          <button className="left" onMouseDown={this.handleIncrementThetaY}> Left </button>
-          <button className="right" onMouseDown={this.handleDecrementThetaY}> Right </button>
-
-          <button className="back" onMouseDown={this.handleDecrementZ}> Back </button>
-          <button className="forward" onMouseDown={this.handleIncrementZ}> Forward </button>
-
-
+          {this.state.is3DView ?
+          <div>
+            <button onClick={this.toggleViewMode} className="toggle-view"> Toggle 2d View </button>
+            <button className="left" onMouseDown={this.handleIncrementThetaY}> Left </button>
+            <button className="right" onMouseDown={this.handleDecrementThetaY}> Right </button>
+            <button className="back" onMouseDown={this.handleDecrementZ}> Back </button>
+            <button className="forward" onMouseDown={this.handleIncrementZ}> Forward </button>
+          </div>
+            : <button className="toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
+
+        <DataLogPanel />
+
       </div>
     );
   }
