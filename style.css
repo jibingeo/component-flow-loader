@@ -1,3 +1,4 @@
+
 .viewport{
     perspective: 700px;
     perspective-origin-x: 50% 200px;
@@ -19,5 +20,38 @@
 
 
 .component-wrapper{
+    position: relative;
     transform-style: preserve-3d;
+}
+
+.meta-panel{
+    left:100px;
+    position: absolute;
+    border: 1px solid #ccc;
+}
+
+
+.left {
+    position: absolute;
+    left: 0;
+    top: 40%;
+}
+
+.right {
+    position: absolute;
+    right: 0;
+    top: 40%;
+}
+
+
+.forward {
+    position: absolute;
+    right: 25%;
+    top: 0;
+}
+
+.back {
+    position: absolute;
+    right: 33%;
+    bottom: 0;
 }

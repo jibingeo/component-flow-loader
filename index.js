@@ -188,8 +188,6 @@ function tranformFile(source){
       //**** AST Scan/collect functions ******
 
 
-
-
       //Wrap top level component in RotateWrapper component
       if(isTopLevelAPIRender(node)){
 
@@ -246,11 +244,55 @@ function tranformFile(source){
         var cName = node.arguments[0].name;
 
 
+        console.log(cName);
+
+
        // console.log("CUSTOM COMPONENT: " + cName);
 
        // console.log(node);
 
         var createElNode = _.cloneDeep(node);
+
+
+
+        //AST chunk for: JSON.parse(JSON.stringify(oldObject))
+        var cloneJSON = {
+            "type": "CallExpression",
+            "callee": {
+              "type": "MemberExpression",
+              "computed": false,
+              "object": {
+                "type": "Identifier",
+                "name": "JSON"
+              },
+              "property": {
+                "type": "Identifier",
+                "name": "parse"
+              }
+            },
+            "arguments": [
+              {
+                "type": "CallExpression",
+                "callee": {
+                  "type": "MemberExpression",
+                  "computed": false,
+                  "object": {
+                    "type": "Identifier",
+                    "name": "JSON"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "name": "stringify"
+                  }
+                },
+                "arguments": [
+                  createElNode.arguments[1]
+                ]
+              }
+            ]
+          };
+
+
 
         var propNode = {
           "type": "ObjectExpression",
@@ -261,7 +303,7 @@ function tranformFile(source){
                 "type": "Identifier",
                 "name": "passedProps"
               },
-              "value": createElNode.arguments[1],
+              "value": cloneJSON,
               "kind": "init"
             },
             {
@@ -292,6 +334,13 @@ function tranformFile(source){
         };
 
 
+
+
+
+
+
+
+
         var wrapped = {
           "type": "CallExpression",
           "callee": {
@@ -316,8 +365,11 @@ function tranformFile(source){
           ]
         };
 
+
+
         this.skip();
         return wrapped;
+
 
       }
 
@@ -425,9 +477,9 @@ module.exports = function(content) {
     filename = path.basename(resourcePath);
 
 
-  var cssPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/style.css';
-  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
-  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataManager/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
+  var cssPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/style.css';
+  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
+  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
 
   if (!/node_modules/.test(this.context)){
 
@@ -441,7 +493,7 @@ module.exports = function(content) {
 
 
     if( _.any(entryPaths, function(e){ return resourcePath.indexOf(e.replace(".", "")) !== -1 })){
-      return  'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("'+ cssPath +'"); \n\n' + tranformFile(content);
+      return 'window.ComponentWrapper = require("'+componentWrapperPath+'"); \n\n   window.RotateWrapper = require("'+ rotateWrapperPath +'");    require("'+ cssPath +'"); \n\n' + tranformFile(content);
     }
     else{
       return tranformFile(content);

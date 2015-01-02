@@ -1,5 +1,5 @@
 
-var React = require('react');
+var React = require('react/addons');
 var _ = require('lodash');
 
 
@@ -10,94 +10,74 @@ var ComponentWrapper = React.createClass({
   getInitialState: function(){
     return {
       didChange: false,
-      color: 'green'
+      color: 'green',
+      top: null,
+      left: null,
+      right: null,
+      bottom: null,
+      position: null
     };
   },
 
   componentDidMount: function(){
+    /*
+    var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
 
-      var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
-
-
-
-    var fixedDescendants = $(this.refs.childComponent.getDOMNode()).find('*').filter(function() {
-      return $(this).css("position") === 'fixed' || $(this).css("position") === 'absolute'
+    var fixedDescendants = $(this.getDOMNode()).find('*').filter(function() {
+      return $(this).attr('class') !== 'component-wrapper' && ($(this).css("position") === 'fixed' || $(this).css("position") === 'absolute');
     });
+
 
 
     if(fixedDescendants.length > 0){
 
-     // var height = $(window).height() - $(this.refs.childComponent.getDOMNode()).offset().top;
-      this.setState({color: 'red', height: '600px'});
-    }
+      var $desc = $(fixedDescendants[0]);
 
 
-    /*
-    if( this.props.wrappedComponentName === 'MappingWizard'){
+      console.log("COPEIED CLASSANAME for  " + this.props.wrappedComponentName + "  ", $desc.attr('class'));
 
-
-      var objHeight = 0;
-      $.each($(this.refs.childComponent.getDOMNode()).children(), function(){
-        objHeight += $(this).height();
+      this.setState({
+        top: $desc.css("top"),
+        left: $desc.css("left"),
+        right: $desc.css("right"),
+        bottom: $desc.css("bottom"),
+        position: $desc.css("position")
       });
-
-
-      debugger
-
-
-
-    }
 */
 
 
-
-
-    /*
-
-    if( this.props.wrappedComponentName === 'MappingWizard'){
-
-
-      debugger
-
-
-
-    }
-
-
-      if (styles.position === 'fixed'){
-
-        console.log(this.props.wrappedComponentName + " is fixed");
-
-
-
-      //  this.setState({height: styles.height});
-        this.setState({height: "600px"});
-      }
-
-
-      */
   },
-
 
   componentWillReceiveProps: function(nextProps, nextState){
 
+    window.np = window.np || [];
+    window.cp = window.cp || [];
+
+
     if(this.props.wrappedComponentName === 'MainSection'){
+
+
       console.log(nextProps.passedProps);
+
+      window.np.push(nextProps.passedProps);
+      window.cp.push(this.props.passedProps);
     }
+
+
 
     if(!_.isEqual(nextProps.passedProps,this.props.passedProps)){
 
       if(this.isMounted()) {
-        this.setState({didChange: true});
+        this.setState({didChange: true, color: 'red'});
       }
 
       setTimeout(function(){
         if(this.isMounted()){
-          this.setState({didChange: false});
+          this.setState({didChange: false, color: 'green'});
         }
 
 
-      }.bind(this), 1000);
+      }.bind(this), 100000000);
     }
 
   },
@@ -112,8 +92,28 @@ var ComponentWrapper = React.createClass({
     });
 
     return (
-      <div className="component-wrapper" style={{"transform": "translateZ("+ z * .05  +"px)", "height": this.state.height, "border": "1px solid " + this.state.color}}>
+      <div className="component-wrapper" style={{
+        "transform": "translateZ("+ z * .05  +"px)",
+        "height": this.state.height,
+        "border": "1px solid " + this.state.color,
+        "top": this.state.top,
+        "left": this.state.left,
+        "right": this.state.right,
+        "bottom": this.state.bottom,
+        "position": this.state.position}}>
+
+
+          {this.state.didChange ?
+            <div className="meta-panel">
+              <h3>{this.props.wrappedComponentName}</h3>
+
+              <pre>{JSON.stringify(this.props.passedProps, null, 2)} </pre>
+            </div>
+
+            : null  }
+
         {child}
+
       </div>
     );
   }

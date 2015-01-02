@@ -6,28 +6,49 @@ var RotateWrapper = React.createClass({
 
   getInitialState: function(){
     return {
-      x: 0,
-      y: 0,
-      z: 0
+      rotationVector: [0,0,0],
+      translationVector: [0,0,-500]
     }
   },
 
-  handleIncrementY:function(){
-    this.setState({y: this.state.y + 20});
+  handleIncrementThetaY:function(){
+    var vec = this.state.rotationVector.slice(0);
+    vec[1] += 20;
+
+    this.setState({rotationVector: vec});
   },
 
-  handleDecrementY:function(){
+  handleDecrementThetaY:function(){
+    var vec = this.state.rotationVector.slice(0);
+    vec[1] -= 20;
 
-    this.setState({y: this.state.y - 20});
+    this.setState({rotationVector: vec});
 
   },
+
+  handleIncrementZ:function(){
+    var vec = this.state.translationVector.slice(0);
+    vec[2] += 80;
+
+    this.setState({translationVector: vec});
+
+  },
+
+  handleDecrementZ:function(){
+    var vec = this.state.translationVector.slice(0);
+    vec[2] -= 80;
+
+    this.setState({translationVector: vec});
+
+  },
+
 
 
   //translate3d(0, 0, 1000px)
 
   render: function () {
 
-    var transformString = {"transform": "rotatey(" + this.state.y + "deg) translate3d(0, 0, -500px)"}
+    var transformString = {"transform": "rotatey(" + this.state.rotationVector[1] + "deg) translate3d("+ this.state.translationVector[0] +"px, "+ this.state.translationVector[1] +"px, "+ this.state.translationVector[2]+"px)"}
 
     return (
 
@@ -40,8 +61,12 @@ var RotateWrapper = React.createClass({
 
         <div className="rotate-controls">
 
-          <button onMouseDown={this.handleIncrementY}> Left </button>
-          <button onMouseDown={this.handleDecrementY}> Right </button>
+          <button className="left" onMouseDown={this.handleIncrementThetaY}> Left </button>
+          <button className="right" onMouseDown={this.handleDecrementThetaY}> Right </button>
+
+          <button className="back" onMouseDown={this.handleDecrementZ}> Back </button>
+          <button className="forward" onMouseDown={this.handleIncrementZ}> Forward </button>
+
 
         </div>
       </div>
