@@ -90,7 +90,7 @@ var ComponentWrapper = React.createClass({
       //document.querySelector('[data-reactid=".0.0.0.0.0.0.1.0"]')
       //make sure to emit that here so the data panel can pick it up
 
-      window.__DDL_EE__.emit("data", this.props.wrappedComponentName, nextProps.passedProps);
+      window.__DDL_EE__.emit("data", this.props.wrappedComponentName, this.props.passedProps, nextProps.passedProps);
 
 
     }
