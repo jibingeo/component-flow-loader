@@ -240,7 +240,7 @@ function tranformFile(source){
 
 
 
-      if(isCreateCustomElementCall(node) && node.arguments[0].name !== 'CSSTransitionGroup'){
+      if(isCreateCustomElementCall(node)){
         var cName = node.arguments[0].name;
 
 

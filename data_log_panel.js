@@ -14,17 +14,19 @@ var DataLogItem = React.createClass({
     componentName: React.PropTypes.string,
   },
 
-  componentShouldUpdate: function(){
+  /*
+  shouldComponentUpdate: function(){
     return false;
 
   },
+*/
 
   render: function () {
 
-    var prevDataString = JSON.stringify(this.props.prevData, null, 2);
-    var nextDataString = JSON.stringify(this.props.nextData, null, 2);
+    var prevDataString = this.props.prevData !== null ? JSON.stringify(this.props.prevData, null, 2) : "";
+    var nextDataString = this.props.nextData !== null ? JSON.stringify(this.props.nextData, null, 2) : "";
 
-    var diff = jsDiff.diffChars(prevDataString, nextDataString);
+    var diff = jsDiff.diffWords(prevDataString, nextDataString);
 
     for (var i=0; i < diff.length; i++) {
       if (diff[i].added && diff[i + 1] && diff[i + 1].removed) {
@@ -36,7 +38,7 @@ var DataLogItem = React.createClass({
 
     return (
       <div className="data-log-item">
-        <h3>{this.props.componentName}</h3>
+        <h3>{this.props.componentName + " - " + this.props.nodeId + " - " + this.props.timestamp + " - " + this.props.lifecyclePhase}</h3>
         <pre>
           {diff.map(function(e){
             if(e.removed){
@@ -70,23 +72,25 @@ var DataLogPanel = React.createClass({
     window.__DDL_EE__.on("data", this.handleLogData);
   },
 
-  handleLogData: function(name, prevData, nextData){
+  handleLogData: function(payload){
     var log = this.state.dataLog;
-    log.unshift({name: name, prev: prevData, next: nextData});
+    log.unshift(payload);
 
     this.setState({dataLog: log});
   },
 
   render: function () {
+
     return (
       <div className="data-log-panel" >
         <div>
             {this.state.dataLog.map(function(d){
-              return  <DataLogItem prevData={d.prev} nextData={d.next} componentName={d.name} />;
+              return  <DataLogItem key={d.nodeId + d.timestamp.getMilliseconds()} {... d} />;
             })}
         </div>
       </div>
     );
+    return null;
   }
 });
 

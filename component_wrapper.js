@@ -3,7 +3,9 @@ var React = require('react/addons');
 var _ = require('lodash');
 
 
-
+/**
+ * Acts as a proxy component that is wrapped around
+ */
 
 var ComponentWrapper = React.createClass({
 
@@ -20,8 +22,27 @@ var ComponentWrapper = React.createClass({
   },
 
 
-
   componentDidMount: function(){
+
+
+    if(this.isMounted()) {
+      this.setState({didChange: true, border: '1px solid red'});
+    }
+
+    setTimeout(function(){
+      if(this.isMounted()){
+        this.setState({didChange: false, border: null});
+      }
+
+
+    }.bind(this), 500);
+
+
+    this._emitDataLogEntry("Mount", null, this.props.passedProps);
+
+    //window.__DDL_EE__.emit("data", this.props.wrappedComponentName, null, this.props.passedProps);
+
+
     /*
     var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
 
@@ -67,10 +88,7 @@ var ComponentWrapper = React.createClass({
     }
 
 
-
     if(!_.isEqual(nextProps.passedProps,this.props.passedProps)){
-
-
 
       if(this.isMounted()) {
         this.setState({didChange: true, border: '1px solid red'});
@@ -84,18 +102,31 @@ var ComponentWrapper = React.createClass({
 
       }.bind(this), 500);
 
-
-
-      //TODO: this._rootNodeID is the id you can use to select the backing dom node and retrive it like this
-      //document.querySelector('[data-reactid=".0.0.0.0.0.0.1.0"]')
-      //make sure to emit that here so the data panel can pick it up
-
-      window.__DDL_EE__.emit("data", this.props.wrappedComponentName, this.props.passedProps, nextProps.passedProps);
-
-
+      this._emitDataLogEntry("ReceiveProps", this.props.passedProps, nextProps.passedProps);
     }
+  },
+
+
+  componentWillUnmount: function(){
+    this._emitDataLogEntry("Unmount", this.props.passedProps, null);
+  },
+
+
+
+  _emitDataLogEntry: function(lifecyclePhase, prevData, nextData){
+
+    window.__DDL_EE__.emit("data", {
+      lifecyclePhase: lifecyclePhase,
+      componentName: this.props.wrappedComponentName,
+      prevData: prevData,
+      nextData: nextData,
+      nodeId: this._rootNodeID,
+      timestamp: new Date()
+    });
 
   },
+
+
 
   render: function () {
 
@@ -105,6 +136,7 @@ var ComponentWrapper = React.createClass({
     var child = React.addons.cloneWithProps(this.props.children, {
       ref: 'childComponent'
     });
+
 
     return (
       <div className="component-wrapper" style={{
