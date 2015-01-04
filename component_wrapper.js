@@ -21,12 +21,21 @@ var ComponentWrapper = React.createClass({
     };
   },
 
+  componentWillMount: function(){
+    this._subscribeLogEntryItemHover();
+  },
+
+  componentWillUnmount: function(){
+    this._emitDataLogEntry("Unmount", this.props.passedProps, null);
+    this._unSubscribeLogEntryItemHover();
+  },
+
 
   componentDidMount: function(){
 
 
     if(this.isMounted()) {
-      this.setState({didChange: true, border: '1px solid red'});
+      this.setState({didChange: true, border: '1px solid #406619'});
     }
 
     setTimeout(function(){
@@ -73,25 +82,10 @@ var ComponentWrapper = React.createClass({
 
   componentWillReceiveProps: function(nextProps, nextState){
 
-    window.np = window.np || [];
-    window.cp = window.cp || [];
-
-
-
-    if(this.props.wrappedComponentName === 'MainSection'){
-
-
-      console.log(nextProps.passedProps);
-
-      window.np.push(nextProps.passedProps);
-      window.cp.push(this.props.passedProps);
-    }
-
-
     if(!_.isEqual(nextProps.passedProps,this.props.passedProps)){
 
       if(this.isMounted()) {
-        this.setState({didChange: true, border: '1px solid red'});
+        this.setState({didChange: true, border: '1px solid #406619'});
       }
 
       setTimeout(function(){
@@ -107,25 +101,43 @@ var ComponentWrapper = React.createClass({
   },
 
 
-  componentWillUnmount: function(){
-    this._emitDataLogEntry("Unmount", this.props.passedProps, null);
-  },
-
-
-
   _emitDataLogEntry: function(lifecyclePhase, prevData, nextData){
-
     window.__DDL_EE__.emit("data", {
       lifecyclePhase: lifecyclePhase,
       componentName: this.props.wrappedComponentName,
+      ownerName: this.props.ownerName,
       prevData: prevData,
       nextData: nextData,
       nodeId: this._rootNodeID,
       timestamp: new Date()
     });
-
   },
 
+  _onLogItemMouseOver: function(nodeid){
+    if(this._rootNodeID === nodeid){
+      if(this.isMounted()) {
+        this.setState({didChange: true, border: '3px solid red'});
+      }
+    }
+  },
+
+  _onLogItemMouseOut: function(nodeid){
+    if(this._rootNodeID === nodeid){
+      if(this.isMounted()) {
+        this.setState({didChange: false, border: null});
+      }
+    }
+  },
+
+  _subscribeLogEntryItemHover: function(){
+    window.__DDL_EE__.on("logitem-mouseover", this._onLogItemMouseOver);
+    window.__DDL_EE__.on("logitem-mouseout", this._onLogItemMouseOut);
+  },
+
+  _unSubscribeLogEntryItemHover: function(){
+    window.__DDL_EE__.removeListener("logitem-mouseover", this._onLogItemMouseOver);
+    window.__DDL_EE__.removeListener("logitem-mouseout", this._onLogItemMouseOut);
+  },
 
 
   render: function () {
@@ -136,7 +148,6 @@ var ComponentWrapper = React.createClass({
     var child = React.addons.cloneWithProps(this.props.children, {
       ref: 'childComponent'
     });
-
 
     return (
       <div className="component-wrapper" style={{

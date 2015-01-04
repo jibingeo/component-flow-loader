@@ -21,6 +21,19 @@ var DataLogItem = React.createClass({
   },
 */
 
+
+  _emitHover: function(eventType, nodeId){
+    window.__DDL_EE__.emit(eventType, nodeId);
+  },
+
+  handleMouseOver: function(){
+    this._emitHover("logitem-mouseover", this.props.nodeId);
+  },
+
+  handleMouseOut: function(){
+    this._emitHover("logitem-mouseout", this.props.nodeId);
+  },
+
   render: function () {
 
     var prevDataString = this.props.prevData !== null ? JSON.stringify(this.props.prevData, null, 2) : "";
@@ -37,8 +50,8 @@ var DataLogItem = React.createClass({
     }
 
     return (
-      <div className="data-log-item">
-        <h3>{this.props.componentName + " - " + this.props.nodeId + " - " + this.props.timestamp + " - " + this.props.lifecyclePhase}</h3>
+      <div className="data-log-item" onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
+        <h3>{this.props.componentName /*+ " -  OWNED BY: " + this.props.ownerName + " - " +  this.props.nodeId + " - " + this.props.timestamp + " - " + this.props.lifecyclePhase*/}</h3>
         <pre>
           {diff.map(function(e){
             if(e.removed){
@@ -58,7 +71,24 @@ var DataLogItem = React.createClass({
   }
 });
 
+/*
 
+function scrollToTop(el, scrollDuration) {
+  var scrollHeight = el.scrollHeight,
+    scrollStep = Math.PI / ( scrollDuration / 15 ),
+    cosParameter = scrollHeight / 2;
+  var scrollCount = 0,
+    scrollMargin,
+    scrollInterval = setInterval( function() {
+      if ( el.scrollTop != 0 ) {
+        scrollCount = scrollCount + 1;
+        scrollMargin = cosParameter - cosParameter * Math.cos( scrollCount * scrollStep );
+        el.scrollTop = (scrollHeight - scrollMargin);
+      }
+      else clearInterval(scrollInterval);
+    }, 15 );
+}
+*/
 
 
 var DataLogPanel = React.createClass({
@@ -72,6 +102,22 @@ var DataLogPanel = React.createClass({
     window.__DDL_EE__.on("data", this.handleLogData);
   },
 
+  componentWillUpdate: function() {
+    var node = this.getDOMNode();
+    this.scrollHeight = node.scrollHeight;
+    this.scrollTop = node.scrollTop;
+  },
+
+  componentDidUpdate: function() {
+   // var node = this.getDOMNode();
+   // node.scrollTop = this.scrollTop + (node.scrollHeight - this.scrollHeight);
+
+    //scrollToTop(node, 1000);
+
+  },
+
+
+
   handleLogData: function(payload){
     var log = this.state.dataLog;
     log.unshift(payload);
@@ -83,11 +129,9 @@ var DataLogPanel = React.createClass({
 
     return (
       <div className="data-log-panel" >
-        <div>
             {this.state.dataLog.map(function(d){
               return  <DataLogItem key={d.nodeId + d.timestamp.getMilliseconds()} {... d} />;
             })}
-        </div>
       </div>
     );
     return null;
