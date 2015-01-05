@@ -77,7 +77,7 @@ var RotateWrapper = React.createClass({
             : <button className="toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
 
-        <DataLogPanel />
+       <DataLogPanel />
 
       </div>
     );

@@ -69,27 +69,15 @@ module.exports = function(source) {
 
       if(node.type === 'Program'){
 
-        //All declared vars here are temporary hacks in dev to workaround npm link issues
-        //var projName = 'DataflowDiagnosticsPOC';
-        var projName = 'DataflowDiagnosticsPOC';
-
-
-        var cssPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/style.css';
-
-
-        var rootWrapperPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/runtime_components/root_wrapper.js';
-        var componentWrapperPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/runtime_components/component_wrapper.js';
-        var makeTreePath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/runtime_components/make_tree.js';
-
         var beforeChunk = esprima.parse(
           [
-            'window.ComponentWrapper = require("' + componentWrapperPath + '");',
-            'var DDLRootWrapper = require("' + rootWrapperPath + '");',
+            'window.ComponentWrapper = require("dataflow-diagnostics-loader/runtime_components/component_wrapper.js");',
+            'var DDLRootWrapper = require("dataflow-diagnostics-loader/runtime_components/root_wrapper.js");',
             'var EventEmitter = require("events").EventEmitter;',
             'window.__DDL_EE__ = new EventEmitter();',
             'window.__DDL_EE__.setMaxListeners(0);',
-            'var computeDepth = require("' + makeTreePath + '");',
-            'require("' + cssPath + '");',
+            'var computeDepth = require("dataflow-diagnostics-loader/runtime_components/make_tree.js");',
+            'require("dataflow-diagnostics-loader/style.css");',
             'global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__  || [];',
             'global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__.concat('+ JSON.stringify(componentRelations) + ')',
           ].join(""));

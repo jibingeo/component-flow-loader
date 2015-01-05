@@ -1,15 +1,21 @@
-
 var React = require('react/addons');
 var _ = require('lodash');
 
 
 /**
- * Acts as a proxy component that is wrapped around
+ * Acts as a proxy component around all ReactComponents
+ *
+ * The transformation process wraps this around all owned components found in render methods, along with a cloned copy
+ * of the props passed to those components (this.props.passedProps) for the purposes of emitting the previous and
+ * next props when a change in the prop data has occurred
+ *
+ * This wrapper also subscribes to the globally exposed event bus to react to interactions with the data_log_panel
+ *
  */
 
 var ComponentWrapper = React.createClass({
 
-  getInitialState: function(){
+  getInitialState: function () {
     return {
       didChange: false,
       border: null,
@@ -21,24 +27,24 @@ var ComponentWrapper = React.createClass({
     };
   },
 
-  componentWillMount: function(){
+  componentWillMount: function () {
     this._subscribeLogEntryItemHover();
   },
 
-  componentWillUnmount: function(){
+  componentWillUnmount: function () {
     this._emitDataLogEntry("Unmount", this.props.passedProps, null);
     this._unSubscribeLogEntryItemHover();
   },
 
 
-  componentDidMount: function(){
+  componentDidMount: function () {
 
-    if(this.isMounted()) {
+    if (this.isMounted()) {
       this.setState({didChange: true, border: '1px solid #406619'});
     }
 
-    setTimeout(function(){
-      if(this.isMounted()){
+    setTimeout(function () {
+      if (this.isMounted()) {
         this.setState({didChange: false, border: null});
       }
 
@@ -52,43 +58,43 @@ var ComponentWrapper = React.createClass({
 
 
     /*
-    var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
+     var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
 
-    var fixedDescendants = $(this.getDOMNode()).find('*').filter(function() {
-      return $(this).attr('class') !== 'component-wrapper' && ($(this).css("position") === 'fixed' || $(this).css("position") === 'absolute');
-    });
-
-
-
-    if(fixedDescendants.length > 0){
-
-      var $desc = $(fixedDescendants[0]);
+     var fixedDescendants = $(this.getDOMNode()).find('*').filter(function() {
+     return $(this).attr('class') !== 'component-wrapper' && ($(this).css("position") === 'fixed' || $(this).css("position") === 'absolute');
+     });
 
 
-      console.log("COPEIED CLASSANAME for  " + this.props.wrappedComponentName + "  ", $desc.attr('class'));
 
-      this.setState({
-        top: $desc.css("top"),
-        left: $desc.css("left"),
-        right: $desc.css("right"),
-        bottom: $desc.css("bottom"),
-        position: $desc.css("position")
-      });
-*/
+     if(fixedDescendants.length > 0){
+
+     var $desc = $(fixedDescendants[0]);
+
+
+     console.log("COPEIED CLASSANAME for  " + this.props.wrappedComponentName + "  ", $desc.attr('class'));
+
+     this.setState({
+     top: $desc.css("top"),
+     left: $desc.css("left"),
+     right: $desc.css("right"),
+     bottom: $desc.css("bottom"),
+     position: $desc.css("position")
+     });
+     */
 
 
   },
 
-  componentWillReceiveProps: function(nextProps, nextState){
+  componentWillReceiveProps: function (nextProps, nextState) {
 
-    if(!_.isEqual(nextProps.passedProps,this.props.passedProps)){
+    if (!_.isEqual(nextProps.passedProps, this.props.passedProps)) {
 
-      if(this.isMounted()) {
+      if (this.isMounted()) {
         this.setState({didChange: true, border: '1px solid #406619'});
       }
 
-      setTimeout(function(){
-        if(this.isMounted()){
+      setTimeout(function () {
+        if (this.isMounted()) {
           this.setState({didChange: false, border: null});
         }
 
@@ -100,7 +106,7 @@ var ComponentWrapper = React.createClass({
   },
 
 
-  _emitDataLogEntry: function(lifecyclePhase, prevData, nextData){
+  _emitDataLogEntry: function (lifecyclePhase, prevData, nextData) {
     window.__DDL_EE__.emit("data", {
       lifecyclePhase: lifecyclePhase,
       componentName: this.props.wrappedComponentName,
@@ -112,28 +118,28 @@ var ComponentWrapper = React.createClass({
     });
   },
 
-  _onLogItemMouseOver: function(nodeid){
-    if(this._rootNodeID === nodeid){
-      if(this.isMounted()) {
+  _onLogItemMouseOver: function (nodeid) {
+    if (this._rootNodeID === nodeid) {
+      if (this.isMounted()) {
         this.setState({didChange: true, border: '3px solid red'});
       }
     }
   },
 
-  _onLogItemMouseOut: function(nodeid){
-    if(this._rootNodeID === nodeid){
-      if(this.isMounted()) {
+  _onLogItemMouseOut: function (nodeid) {
+    if (this._rootNodeID === nodeid) {
+      if (this.isMounted()) {
         this.setState({didChange: false, border: null});
       }
     }
   },
 
-  _subscribeLogEntryItemHover: function(){
+  _subscribeLogEntryItemHover: function () {
     window.__DDL_EE__.on("logitem-mouseover", this._onLogItemMouseOver);
     window.__DDL_EE__.on("logitem-mouseout", this._onLogItemMouseOut);
   },
 
-  _unSubscribeLogEntryItemHover: function(){
+  _unSubscribeLogEntryItemHover: function () {
     window.__DDL_EE__.removeListener("logitem-mouseover", this._onLogItemMouseOver);
     window.__DDL_EE__.removeListener("logitem-mouseout", this._onLogItemMouseOut);
   },
@@ -141,7 +147,9 @@ var ComponentWrapper = React.createClass({
 
   render: function () {
 
-    var depth = window.__DDL_ADJLIST__.filter((e) => { return ((e.name === this.props.wrappedComponentName) && (e.parent === this.props.ownerName));})[0].depth;
+    var depth = window.__DDL_ADJLIST__.filter((e) => {
+      return ((e.name === this.props.wrappedComponentName) && (e.parent === this.props.ownerName));
+    })[0].depth;
 
     var child = React.addons.cloneWithProps(this.props.children, {
       ref: 'childComponent'
@@ -150,14 +158,15 @@ var ComponentWrapper = React.createClass({
 
     return (
       <div className="component-wrapper" style={{
-        "transform": "translateZ("+ depth * 10 +"px)",
+        "transform": "translateZ(" + depth * 10 + "px)",
         "height": this.state.height,
         "border": this.state.border,
         "top": this.state.top,
         "left": this.state.left,
         "right": this.state.right,
         "bottom": this.state.bottom,
-        "position": this.state.position}}>
+        "position": this.state.position
+      }}>
 
         {child}
 
