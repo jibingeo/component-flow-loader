@@ -34,6 +34,17 @@ var ComponentWrapper = React.createClass({
   componentDidMount: function(){
 
 
+
+
+    /*
+    console.log(window.__DDL_ADJLIST__.filter((e) => {
+      return (
+        (e.name === this.props.wrappedComponentName) &&
+        (e.parent === this.props.ownerName));
+    } )[0].depth  );
+*/
+
+
     if(this.isMounted()) {
       this.setState({didChange: true, border: '1px solid #406619'});
     }
@@ -142,16 +153,16 @@ var ComponentWrapper = React.createClass({
 
   render: function () {
 
-    var z = this.props.wrappedComponentName.split('').map(function(e) { return e.charCodeAt(0);}).reduce(function(e,u) { return e + u;}, 0);
-    var transform = null;
+    var depth = window.__DDL_ADJLIST__.filter((e) => { return ((e.name === this.props.wrappedComponentName) && (e.parent === this.props.ownerName));})[0].depth;
 
     var child = React.addons.cloneWithProps(this.props.children, {
       ref: 'childComponent'
     });
 
+
     return (
       <div className="component-wrapper" style={{
-        "transform": "translateZ("+ z * .05  +"px)",
+        "transform": "translateZ("+ depth * 10 +"px)",
         "height": this.state.height,
         "border": this.state.border,
         "top": this.state.top,

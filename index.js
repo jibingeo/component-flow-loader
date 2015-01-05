@@ -127,15 +127,9 @@ function isTopLevelAPIRender(node) {
  */
 function tranformFile(source) {
 
-  //[{componentName: 'MyComponent', childComponents: [], ...]
-  var componentModels = [];
 
-  var requireIdentifiers = [];
-  var exportedIdentifier;
-
-
-  var currentComponentModel;
-
+  //[{parent:'ParentCopnent', name:'ChildComponent'}..]
+  var componentRelations = [];
 
   var ast = esprima.parse(source);
 
@@ -145,66 +139,20 @@ function tranformFile(source) {
   estraverse.replace(ast, {
     enter: function (node, parent) {
 
-      //**** AST Scan/collect functions ******
-
-
-      //Wrap top level component in RotateWrapper component
-      if (isTopLevelAPIRender(node)) {
-
-        var wrapped = {
-          "type": "CallExpression",
-          "callee": {
-            "type": "MemberExpression",
-            "computed": false,
-            "object": {
-              "type": "Identifier",
-              "name": "React"
-            },
-            "property": {
-              "type": "Identifier",
-              "name": "createElement"
-            }
-          },
-          "arguments": [
-            {
-              "type": "Identifier",
-              "name": "RotateWrapper"
-            },
-            {
-              "type": "Literal",
-              "value": null
-            },
-            _.cloneDeep(node.arguments[0])
-          ]
-        };
-
-
-        node.arguments[0] = wrapped;
-
-        console.log(escodegen.generate(node));
-
-
-        this.skip();
-        return node;
-
-      }
-
-
       //Going to traverse the component declaration subtree --
       //create a new object to store the owned child components that will get traversed
       if (isComponentDeclaration(node)) {
-
         curComponent = node.declarations[0].id.name;
-        // console.log(node.declarations[0].id.name)
       }
 
 
       if (isCreateCustomElementCall(node)) {
         var cName = node.arguments[0].name;
 
-        console.log(cName);
 
         var createElNode = _.cloneDeep(node);
+        componentRelations.push({parent: curComponent, name: cName});
+
 
         //AST chunk for: JSON.parse(JSON.stringify(oldObject))
         var cloneJSON = {
@@ -314,21 +262,10 @@ function tranformFile(source) {
       }
 
 
-      if (isPropsMemberExpression(node)) {
-        var usedPropName = node.property.name;
-
-        /*
-         if(currentComponentModel && !_.contains(currentComponentModel.usedProps, usedPropName)) {
-         currentComponentModel.usedProps.push(usedPropName);
-         }
-         */
-      }
-
-
       if (isRequireDeclaration(node)) {
         // requireIdentifiers.push(node.id.name);
       }
-      ;
+
 
       if (isExportIdentifier(node)) {
         //exportedIdentifier = node.right.name;
@@ -339,12 +276,120 @@ function tranformFile(source) {
 
     leave: function (node, parent) {
 
+      if(node.type === 'Program'){
+
+        var chunk = esprima.parse(
+          [
+            "global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__  || [];",
+            "global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__.concat("+ JSON.stringify(componentRelations) +")"
+          ].join("")
+        );
+
+        node.body.push(chunk);
+
+
+        return node;
+
+      }
+
     }
   });
 
 
   return escodegen.generate(ast);
 }
+
+
+function transformEntryModule(source) {
+  var ast = esprima.parse(source);
+
+
+  //Store the root component of the hierarchy
+  //[{parent: null, name:'TopLevelComponent'}..]
+  var componentRelations = [];
+
+  estraverse.replace(ast, {
+    enter: function(node, parent){
+      //Wrap top level component in RotateWrapper component
+      if (isTopLevelAPIRender(node)) {
+
+        var rootComponentName = node.arguments[0].arguments[0].name;
+        componentRelations.push({parent:null, name: rootComponentName});
+
+
+        var wrapped = {
+          "type": "CallExpression",
+          "callee": {
+            "type": "MemberExpression",
+            "computed": false,
+            "object": {
+              "type": "Identifier",
+              "name": "React"
+            },
+            "property": {
+              "type": "Identifier",
+              "name": "createElement"
+            }
+          },
+          "arguments": [
+            {
+              "type": "Identifier",
+              "name": "RotateWrapper"
+            },
+            {
+              "type": "Literal",
+              "value": null
+            },
+            _.cloneDeep(node.arguments[0])
+          ]
+        };
+
+        node.arguments[0] = wrapped;
+
+        this.skip();
+        return node;
+      }
+    },
+
+    leave: function (node, parent) {
+
+      if(node.type === 'Program'){
+
+        //All declared vars here are temporary hacks in dev to workaround npm link issues
+        var projName = 'DataflowDiagnosticsPOC';
+
+
+        var cssPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/style.css';
+        var rotateWrapperPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
+        var componentWrapperPath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
+        var makeTreePath = '/Users/opengov/WebstormProjects/'+projName+ '/node_modules/dataflow-diagnostics-loader/make_tree.js';
+
+        var beforeChunk = esprima.parse(
+          [
+            'window.ComponentWrapper = require("' + componentWrapperPath + '");',
+            'window.RotateWrapper = require("' + rotateWrapperPath + '");',
+            'var EventEmitter = require("events").EventEmitter;',
+            'window.__DDL_EE__ = new EventEmitter();',
+            'var computeDepth = require("' + makeTreePath + '");',
+            'require("' + cssPath + '");',
+            'global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__  || [];',
+            'global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__.concat('+ JSON.stringify(componentRelations) + ')',
+        ].join(""));
+
+
+        var afterChunk = esprima.parse('computeDepth(global.__DDL_ADJLIST__);');
+
+          node.body.unshift(beforeChunk);
+          node.body.push(afterChunk);
+
+          return node;
+      }
+    }
+  });
+  return escodegen.generate(ast);
+
+}
+
 
 
 function getEntryArray(entry) {
@@ -361,10 +406,6 @@ function getEntryArray(entry) {
 
 module.exports = function (source) {
 
-  var self = this;
-  var output = "";
-
-
   var resourcePath = this.resourcePath,
     filename = path.basename(resourcePath);
 
@@ -373,11 +414,6 @@ module.exports = function (source) {
     // Don't instrument 3rd party deps
     return source;
   }
-
-
-  var cssPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/style.css';
-  var rotateWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/rotate_wrapper.js';
-  var componentWrapperPath = '/Users/opengov/WebstormProjects/DataflowDiagnosticsPOC/node_modules/dataflow-diagnostics-loader/component_wrapper.js';
 
 
   console.log("Instrumenting: ", filename);
@@ -394,12 +430,7 @@ module.exports = function (source) {
   if (_.any(entryPaths, function (e) {
       return resourcePath.indexOf(e.replace(".", "")) !== -1
     })) {
-    return ['window.ComponentWrapper = require("' + componentWrapperPath + '");',
-            'window.RotateWrapper = require("' + rotateWrapperPath + '");',
-            'var EventEmitter = require("events").EventEmitter;',
-            'window.__DDL_EE__ = new EventEmitter();',
-            'require("' + cssPath + '");',
-            tranformFile(source)].join('\n\n');
+    return transformEntryModule(source);
   }
   else {
     return tranformFile(source);

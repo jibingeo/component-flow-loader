@@ -1,8 +1,8 @@
 
 var React = require('react');
-
-
 var DataLogPanel = require('./data_log_panel');
+
+
 
 var RotateWrapper = React.createClass({
 
@@ -54,18 +54,16 @@ var RotateWrapper = React.createClass({
 
   render: function () {
 
+
     var transformString = {"transform": "rotatey(" + this.state.rotationVector[1] + "deg) translate3d("+ this.state.translationVector[0] +"px, "+ this.state.translationVector[1] +"px, "+ this.state.translationVector[2]+"px)"}
 
     return (
-
       <div>
         <div className={this.state.is3DView ? "viewport" : null}>
           <div className="rotate-wrapper" style={this.state.is3DView ? transformString: null}>
             {this.props.children}
           </div>
         </div>
-
-
 
         <div className="rotate-controls">
           {this.state.is3DView ?
