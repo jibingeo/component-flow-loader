@@ -33,18 +33,6 @@ var ComponentWrapper = React.createClass({
 
   componentDidMount: function(){
 
-
-
-
-    /*
-    console.log(window.__DDL_ADJLIST__.filter((e) => {
-      return (
-        (e.name === this.props.wrappedComponentName) &&
-        (e.parent === this.props.ownerName));
-    } )[0].depth  );
-*/
-
-
     if(this.isMounted()) {
       this.setState({didChange: true, border: '1px solid #406619'});
     }

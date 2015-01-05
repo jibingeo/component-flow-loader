@@ -129,8 +129,8 @@ var DataLogPanel = React.createClass({
 
     return (
       <div className="data-log-panel" >
-            {this.state.dataLog.map(function(d){
-              return  <DataLogItem key={d.nodeId + d.timestamp.getMilliseconds()} {... d} />;
+            {this.state.dataLog.map(function(d, i){
+              return  <DataLogItem key={i} {... d} />;
             })}
       </div>
     );
