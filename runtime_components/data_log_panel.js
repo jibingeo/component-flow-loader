@@ -5,8 +5,6 @@ var _ = require('lodash');
 var jsDiff = require('diff');
 
 
-
-
 var DataLogItem = React.createClass({
 
   propTypes:{
