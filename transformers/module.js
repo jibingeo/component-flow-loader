@@ -33,7 +33,7 @@ module.exports = function(source) {
 
         var parentName = curComponent;
         var componentName = node.arguments[0].name;
-        var createElNode = _.cloneDeep(node);
+        var createElNode = node;
 
         var wrapperTemplate = esprima.parse(
           [
