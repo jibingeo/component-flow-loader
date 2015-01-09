@@ -1,4 +1,7 @@
+"use strict"
+
 var React = require('react/addons');
+var cx = React.addons.classSet;
 var _ = require('lodash');
 
 
@@ -40,7 +43,7 @@ var ComponentWrapper = React.createClass({
   componentDidMount: function () {
 
     if (this.isMounted()) {
-      this.setState({didChange: true, border: '1px solid #406619'});
+      this.setState({didChange: true,  boxShadow:"inset 0 0 0 3px red"});
     }
 
     setTimeout(function () {
@@ -90,7 +93,7 @@ var ComponentWrapper = React.createClass({
     if (!_.isEqual(nextProps.passedProps, this.props.passedProps)) {
 
       if (this.isMounted()) {
-        this.setState({didChange: true, border: '1px solid #406619'});
+        this.setState({didChange: true});
       }
 
       setTimeout(function () {
@@ -121,7 +124,7 @@ var ComponentWrapper = React.createClass({
   _onLogItemMouseOver: function (nodeid) {
     if (this._rootNodeID === nodeid) {
       if (this.isMounted()) {
-        this.setState({didChange: true, border: '3px solid red'});
+        this.setState({didChange: true});
       }
     }
   },
@@ -147,18 +150,18 @@ var ComponentWrapper = React.createClass({
 
   render: function () {
 
-    var depth = window.__DDL_ADJLIST__.filter((e) => {
-      return ((e.name === this.props.wrappedComponentName) && (e.parent === this.props.ownerName));
-    })[0].depth;
-
     var child = React.addons.cloneWithProps(this.props.children, {
       ref: 'childComponent'
     });
 
+    var wrapperClass = cx({
+        "component-wrapper": true,
+        "changed": this.state.didChange
+    });
 
     return (
-      <div className="component-wrapper" style={{
-        "transform": "translateZ(" + depth * 10 + "px)",
+      <div className={wrapperClass} style={{
+        "transform": "translateZ(" + this._mountDepth * 8 + "px)",
         "height": this.state.height,
         "border": this.state.border,
         "top": this.state.top,
@@ -167,9 +170,7 @@ var ComponentWrapper = React.createClass({
         "bottom": this.state.bottom,
         "position": this.state.position
       }}>
-
         {child}
-
       </div>
     );
   }

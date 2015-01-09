@@ -1,8 +1,17 @@
+"use strict"
+
 
 var React = require('react');
 var DataLogPanel = require('./data_log_panel');
 
 
+var EventEmitter = require("events").EventEmitter;
+window.__DDL_EE__ = new EventEmitter();
+window.__DDL_EE__.setMaxListeners(0);
+
+
+
+require('./style.css');
 
 var RotateWrapper = React.createClass({
 

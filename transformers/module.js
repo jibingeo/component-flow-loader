@@ -1,198 +1,75 @@
+"use strict"
+
 var _ = require('lodash');
 var esprima = require('esprima');
 var estraverse = require('estraverse');
 var escodegen = require('escodegen');
 
-
-
-//Matches: var SomeComponent = React.createClass({})
-function isComponentDeclaration(node) {
-  return (
-  node.type === 'VariableDeclaration' &&
-  node.declarations[0] &&
-  node.declarations[0].type === 'VariableDeclarator' &&
-  node.declarations[0].init &&
-  node.declarations[0].init.type === 'CallExpression' &&
-  node.declarations[0].init.callee.type === 'MemberExpression' &&
-  node.declarations[0].init.callee.property.name === 'createClass');
-}
-
-
-//Matches on React.createElement(SomeCustomELement, ......) calls where the passed in element is an identifier (as opposed to "div" "ul" etc)
-function isCreateCustomElementCall(node) {
-  return (node.type === 'CallExpression' &&
-  node.callee.type === 'MemberExpression' &&
-  node.callee.property.name === 'createElement' &&
-  node.arguments[0].type === 'Identifier')
-
-}
-
-
+var t = require('./util/node_types');
 
 /**
- * Transforms render methods
- * @param source
- * @returns {*}
+ * Instruments owned components by wrapping them with component that also receives a cloned copy of
+ * the props provided by a parent.
+ *
+ * NOTE: Current implementation only supports components that pass down JSON serializable data
+ * due to how cloning is performed...
+ *
+ * @param {String} source
+ * @returns {String} output
  */
 module.exports = function(source) {
 
-
-  //[{parent:'ParentCopnent', name:'ChildComponent'}..]
-  var componentRelations = [];
-
   var ast = esprima.parse(source);
-
   var curComponent = "";
-
 
   estraverse.replace(ast, {
     enter: function (node, parent) {
 
-      //Going to traverse the component declaration subtree --
-      //create a new object to store the owned child components that will get traversed
-      if (isComponentDeclaration(node)) {
+      if (t.isComponentDeclaration(node)) {
         curComponent = node.declarations[0].id.name;
       }
 
+      if (t.isCreateCustomElementCall(node)) {
 
-      if (isCreateCustomElementCall(node)) {
-        var cName = node.arguments[0].name;
-
-
+        var parentName = curComponent;
+        var componentName = node.arguments[0].name;
         var createElNode = _.cloneDeep(node);
-        componentRelations.push({parent: curComponent, name: cName});
 
+        var wrapperTemplate = esprima.parse(
+          [
+            'React.createElement(ComponentWrapper__DDL, {',
+            '  passedProps: JSON.parse(JSON.stringify(PROPS_PLACEHOLDER)),',
+            '  wrappedComponentName: "COMPONENT_NAME_PLACEHOLDER",',
+            '  ownerName: "OWNER_NAME_PLACEHOLDER"',
+            '}, COMPONENT)'
+          ].join('')
+        );
 
-        //AST chunk for: JSON.parse(JSON.stringify(oldObject))
-        var cloneJSON = {
-          "type": "CallExpression",
-          "callee": {
-            "type": "MemberExpression",
-            "computed": false,
-            "object": {
-              "type": "Identifier",
-              "name": "JSON"
-            },
-            "property": {
-              "type": "Identifier",
-              "name": "parse"
-            }
-          },
-          "arguments": [
-            {
-              "type": "CallExpression",
-              "callee": {
-                "type": "MemberExpression",
-                "computed": false,
-                "object": {
-                  "type": "Identifier",
-                  "name": "JSON"
-                },
-                "property": {
-                  "type": "Identifier",
-                  "name": "stringify"
-                }
-              },
-              "arguments": [
-                createElNode.arguments[1]
-              ]
-            }
-          ]
-        };
+        var retNode = wrapperTemplate.body[0].expression;
 
-
-        var propNode = {
-          "type": "ObjectExpression",
-          "properties": [
-            {
-              "type": "Property",
-              "key": {
-                "type": "Identifier",
-                "name": "passedProps"
-              },
-              "value": cloneJSON,
-              "kind": "init"
-            },
-            {
-              "type": "Property",
-              "key": {
-                "type": "Identifier",
-                "name": "wrappedComponentName"
-              },
-              "value": {
-                "type": "Literal",
-                "value": cName,
-              },
-              "kind": "init"
-            },
-            {
-              "type": "Property",
-              "key": {
-                "type": "Identifier",
-                "name": "ownerName"
-              },
-              "value": {
-                "type": "Literal",
-                "value": curComponent,
-              },
-              "kind": "init"
-            }
-          ]
-        };
-
-
-        var wrapped = {
-          "type": "CallExpression",
-          "callee": {
-            "type": "MemberExpression",
-            "computed": false,
-            "object": {
-              "type": "Identifier",
-              "name": "React"
-            },
-            "property": {
-              "type": "Identifier",
-              "name": "createElement"
-            }
-          },
-          "arguments": [
-            {
-              "type": "Identifier",
-              "name": "ComponentWrapper"
-            },
-            propNode,
-            createElNode
-          ]
-        };
+        retNode.arguments[1].properties[0].value.arguments[0].arguments[0] = createElNode.arguments[1];
+        retNode.arguments[1].properties[1].value.value = componentName;
+        retNode.arguments[1].properties[2].value.value = parentName;
+        retNode.arguments[2] = createElNode;
 
         //Prevent further traversal and ComponentWrapper wrapping
         this.skip();
-        return wrapped;
+        return retNode;
       }
-
     },
-
     leave: function (node, parent) {
 
       if(node.type === 'Program'){
 
-        var chunk = esprima.parse(
-          [
-            "global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__  || [];",
-            "global.__DDL_ADJLIST__ = global.__DDL_ADJLIST__.concat("+ JSON.stringify(componentRelations) +")"
-          ].join("")
+        var beforeChunk = esprima.parse(
+          'var ComponentWrapper__DDL = require("dataflow-diagnostics-loader/runtime_components/component_wrapper.js");'
         );
 
-        node.body.push(chunk);
-
-
+        node.body.unshift(beforeChunk);
         return node;
-
       }
-
     }
   });
-
 
   return escodegen.generate(ast);
 }

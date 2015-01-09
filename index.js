@@ -23,6 +23,10 @@ module.exports = function (source) {
   var resourcePath = this.resourcePath,
     filename = path.basename(resourcePath);
 
+  if (this.cacheable) {
+    this.cacheable();
+  }
+
   if (/node_modules/.test(resourcePath)) {
     // Don't instrument 3rd party deps
     return source;
