@@ -7,7 +7,6 @@ var escodegen = require('escodegen');
 
 var t = require('./util/node_types');
 
-
 /**
  * Wraps top level component in root controller component
  *
@@ -39,7 +38,7 @@ module.exports = function(source) {
       if(node.type === 'Program'){
 
         var chunk = esprima.parse(
-          'var RootWrapper__DDL = require("dataflow-diagnostics-loader/runtime_components/root_wrapper.js");'
+          'var RootWrapper__DDL = require("component-flow-loader/runtime_components/root_wrapper.js");'
         );
 
         node.body.unshift(chunk);

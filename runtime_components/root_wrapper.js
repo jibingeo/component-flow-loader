@@ -10,7 +10,6 @@ window.__DDL_EE__ = new EventEmitter();
 window.__DDL_EE__.setMaxListeners(0);
 
 
-
 require('./style.css');
 
 var RotateWrapper = React.createClass({
@@ -86,7 +85,7 @@ var RotateWrapper = React.createClass({
             : <button className="toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
 
-       <DataLogPanel />
+      <DataLogPanel />
 
       </div>
     );

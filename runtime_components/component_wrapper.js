@@ -91,19 +91,14 @@ var ComponentWrapper = React.createClass({
   componentWillReceiveProps: function (nextProps, nextState) {
 
     if (!_.isEqual(nextProps.passedProps, this.props.passedProps)) {
-
       if (this.isMounted()) {
         this.setState({didChange: true});
       }
-
       setTimeout(function () {
         if (this.isMounted()) {
           this.setState({didChange: false, border: null});
         }
-
-
       }.bind(this), 500);
-
       this._emitDataLogEntry("ReceiveProps", this.props.passedProps, nextProps.passedProps);
     }
   },
@@ -161,7 +156,7 @@ var ComponentWrapper = React.createClass({
 
     return (
       <div className={wrapperClass} style={{
-        "transform": "translateZ(" + this._mountDepth * 8 + "px)",
+        "transform": "translateZ(" + this._mountDepth * 3 + "px)",
         "height": this.state.height,
         "border": this.state.border,
         "top": this.state.top,

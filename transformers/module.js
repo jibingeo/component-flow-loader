@@ -62,7 +62,7 @@ module.exports = function(source) {
       if(node.type === 'Program'){
 
         var beforeChunk = esprima.parse(
-          'var ComponentWrapper__DDL = require("dataflow-diagnostics-loader/runtime_components/component_wrapper.js");'
+          'var ComponentWrapper__DDL = require("component-flow-loader/runtime_components/component_wrapper.js");'
         );
 
         node.body.unshift(beforeChunk);

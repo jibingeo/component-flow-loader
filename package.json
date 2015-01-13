@@ -1,5 +1,5 @@
 {
-  "name": "dataflow-diagnostics-loader",
+  "name": "component-flow-loader",
   "version": "0.0.0",
   "description": "A webpack loader for transforming component ASTs to render out diagnostic information",
   "main": "index.js",
