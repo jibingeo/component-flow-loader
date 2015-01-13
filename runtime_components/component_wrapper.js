@@ -1,8 +1,11 @@
 "use strict"
 
 var React = require('react/addons');
-var cx = React.addons.classSet;
 var _ = require('lodash');
+
+var cx = React.addons.classSet;
+
+var eventBus = require('./event_bus');
 
 
 /**
@@ -105,7 +108,7 @@ var ComponentWrapper = React.createClass({
 
 
   _emitDataLogEntry: function (lifecyclePhase, prevData, nextData) {
-    window.__DDL_EE__.emit("data", {
+    eventBus.emit("data", {
       lifecyclePhase: lifecyclePhase,
       componentName: this.props.wrappedComponentName,
       ownerName: this.props.ownerName,
@@ -133,13 +136,13 @@ var ComponentWrapper = React.createClass({
   },
 
   _subscribeLogEntryItemHover: function () {
-    window.__DDL_EE__.on("logitem-mouseover", this._onLogItemMouseOver);
-    window.__DDL_EE__.on("logitem-mouseout", this._onLogItemMouseOut);
+    eventBus.on("logitem-mouseover", this._onLogItemMouseOver);
+    eventBus.on("logitem-mouseout", this._onLogItemMouseOut);
   },
 
   _unSubscribeLogEntryItemHover: function () {
-    window.__DDL_EE__.removeListener("logitem-mouseover", this._onLogItemMouseOver);
-    window.__DDL_EE__.removeListener("logitem-mouseout", this._onLogItemMouseOut);
+    eventBus.removeListener("logitem-mouseover", this._onLogItemMouseOver);
+    eventBus.removeListener("logitem-mouseout", this._onLogItemMouseOut);
   },
 
 
@@ -163,8 +166,7 @@ var ComponentWrapper = React.createClass({
         "left": this.state.left,
         "right": this.state.right,
         "bottom": this.state.bottom,
-        "position": this.state.position
-      }}>
+        "position": this.state.position}}>
         {child}
       </div>
     );

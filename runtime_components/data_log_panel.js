@@ -4,6 +4,7 @@ var React = require('react/addons');
 var _ = require('lodash');
 var jsDiff = require('diff');
 
+var eventBus = require('./event_bus');
 
 var DataLogItem = React.createClass({
 
@@ -22,7 +23,7 @@ var DataLogItem = React.createClass({
 
 
   _emitHover: function(eventType, nodeId){
-    window.__DDL_EE__.emit(eventType, nodeId);
+    eventBus.emit(eventType, nodeId);
   },
 
   handleMouseOver: function(){
@@ -98,7 +99,7 @@ var DataLogPanel = React.createClass({
   },
 
   componentWillMount: function(){
-    window.__DDL_EE__.on("data", this.handleLogData);
+    eventBus.on("data", this.handleLogData);
   },
 
   componentWillUpdate: function() {
@@ -125,15 +126,13 @@ var DataLogPanel = React.createClass({
   },
 
   render: function () {
-
     return (
       <div className="data-log-panel" >
-            {this.state.dataLog.map(function(d, i){
-              return  <DataLogItem key={i} {... d} />;
-            })}
+        {this.state.dataLog.map(function(d, i){
+          return  <DataLogItem key={i} {... d} />;
+        })}
       </div>
     );
-    return null;
   }
 });
 
