@@ -32,7 +32,6 @@ module.exports = function (source) {
     return source;
   }
 
-  console.log("Instrumenting: ", filename);
 
   //Parse out all potential app entry points
   var entryPaths = !_.isPlainObject(this.options.entry) ?
@@ -46,7 +45,17 @@ module.exports = function (source) {
     return resourcePath.indexOf(e.replace(".", "")) !== -1
   });
 
-
-  return isEntryModule ? transformEntryModule(source) : transformModule(source);
-
+  if(isEntryModule){
+    console.log("Instrumenting entry module: ", filename);
+    return transformEntryModule(source);
+  }
+  //Only transform source files that define components
+  else if (source.match(/\React.createClass/)){
+    console.log("Instrumenting module: ", filename);
+    return transformModule(source);
+  }
+  else{
+    return source;
+  }
+  
 }

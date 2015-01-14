@@ -17,7 +17,7 @@ t.isComponentDeclaration = function(node) {
 }
 
 //Matches on React.createElement(SomeCustomELement, ......)
-t.isCreateCustomElementCall = function(node) {
+t.isCreateElementCall = function(node) {
   return (
     node.type === 'CallExpression' &&
     node.callee.type === 'MemberExpression' &&

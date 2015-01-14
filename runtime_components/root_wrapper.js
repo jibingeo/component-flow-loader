@@ -5,7 +5,7 @@ var React = require('react');
 var DataLogPanel = require('./data_log_panel');
 
 
-require('./style.css');
+require('style!css!./style.css');
 
 var RotateWrapper = React.createClass({
 
