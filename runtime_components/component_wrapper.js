@@ -53,42 +53,9 @@ var ComponentWrapper = React.createClass({
       if (this.isMounted()) {
         this.setState({didChange: false, border: null});
       }
-
-
     }.bind(this), 500);
 
-
     this._emitDataLogEntry("Mount", null, this.props.passedProps);
-
-    //window.__DDL_EE__.emit("data", this.props.wrappedComponentName, null, this.props.passedProps);
-
-
-    /*
-     var styles = getComputedStyle(this.refs.childComponent.getDOMNode());
-
-     var fixedDescendants = $(this.getDOMNode()).find('*').filter(function() {
-     return $(this).attr('class') !== 'component-wrapper' && ($(this).css("position") === 'fixed' || $(this).css("position") === 'absolute');
-     });
-
-
-
-     if(fixedDescendants.length > 0){
-
-     var $desc = $(fixedDescendants[0]);
-
-
-     console.log("COPEIED CLASSANAME for  " + this.props.wrappedComponentName + "  ", $desc.attr('class'));
-
-     this.setState({
-     top: $desc.css("top"),
-     left: $desc.css("left"),
-     right: $desc.css("right"),
-     bottom: $desc.css("bottom"),
-     position: $desc.css("position")
-     });
-     */
-
-
   },
 
   componentWillReceiveProps: function (nextProps, nextState) {
@@ -110,8 +77,8 @@ var ComponentWrapper = React.createClass({
   _emitDataLogEntry: function (lifecyclePhase, prevData, nextData) {
     eventBus.emit("data", {
       lifecyclePhase: lifecyclePhase,
-      componentName: this.props.wrappedComponentName,
-      ownerName: this.props.ownerName,
+      componentName: React.Children.only(this.props.children).type.displayName,
+      ownerName: this._owner.constructor.displayName,
       prevData: prevData,
       nextData: nextData,
       nodeId: this._rootNodeID,
@@ -148,10 +115,6 @@ var ComponentWrapper = React.createClass({
 
   render: function () {
 
-    var child = React.addons.cloneWithProps(this.props.children, {
-      ref: 'childComponent'
-    });
-
     var wrapperClass = cx({
         "component-wrapper": true,
         "changed": this.state.didChange
@@ -167,7 +130,7 @@ var ComponentWrapper = React.createClass({
         "right": this.state.right,
         "bottom": this.state.bottom,
         "position": this.state.position}}>
-        {child}
+          {this.props.children}
       </div>
     );
   }
