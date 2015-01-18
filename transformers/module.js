@@ -28,15 +28,15 @@ module.exports = function (source) {
 
         var wrapperTemplate = esprima.parse(
           [
-            'React.createElement(ComponentWrapper__DDL, {',
-            '  passedProps: JSON.parse(JSON.stringify(PROPS_PLACEHOLDER)),',
-            '}, COMPONENT_PLACEHOLDER)'
+            'React.createElement(ComponentWrapper__DDL, ',
+            '  JSON.parse(JSON.stringify(PROPS_PLACEHOLDER)),',
+            '  COMPONENT_PLACEHOLDER)'
           ].join('')
         );
 
         var retNode = wrapperTemplate.body[0].expression;
 
-        retNode.arguments[1].properties[0].value.arguments[0].arguments[0] = node.arguments[1];
+        retNode.arguments[1].arguments[0].arguments[0] = node.arguments[1];
         retNode.arguments[2] = node;
 
         //Prevent further traversal and ComponentWrapper wrapping

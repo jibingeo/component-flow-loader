@@ -12,7 +12,7 @@ var eventBus = require('./event_bus');
  * Acts as a proxy component around all ReactComponents
  *
  * The transformation process wraps this around all owned components found in render methods, along with a cloned copy
- * of the props passed to those components (this.props.passedProps) for the purposes of emitting the previous and
+ * of the props passed to those components (this.props) for the purposes of emitting the previous and
  * next props when a change in the prop data has occurred
  *
  * This wrapper also subscribes to the globally exposed event bus to react to interactions with the data_log_panel
@@ -38,7 +38,7 @@ var ComponentWrapper = React.createClass({
   },
 
   componentWillUnmount: function () {
-    this._emitDataLogEntry("Unmount", this.props.passedProps, null);
+    this._emitDataLogEntry("Unmount", this.props, null);
     this._unSubscribeLogEntryItemHover();
   },
 
@@ -55,12 +55,12 @@ var ComponentWrapper = React.createClass({
       }
     }.bind(this), 500);
 
-    this._emitDataLogEntry("Mount", null, this.props.passedProps);
+    this._emitDataLogEntry("Mount", null, this.props);
   },
 
   componentWillReceiveProps: function (nextProps, nextState) {
 
-    if (!_.isEqual(nextProps.passedProps, this.props.passedProps)) {
+    if (!_.isEqual(nextProps, this.props)) {
       if (this.isMounted()) {
         this.setState({didChange: true});
       }
@@ -69,7 +69,7 @@ var ComponentWrapper = React.createClass({
           this.setState({didChange: false, border: null});
         }
       }.bind(this), 500);
-      this._emitDataLogEntry("ReceiveProps", this.props.passedProps, nextProps.passedProps);
+      this._emitDataLogEntry("ReceiveProps", this.props, nextProps);
     }
   },
 
@@ -79,8 +79,8 @@ var ComponentWrapper = React.createClass({
       lifecyclePhase: lifecyclePhase,
       componentName: React.Children.only(this.props.children).type.displayName,
       ownerName: this._owner.constructor.displayName,
-      prevData: prevData,
-      nextData: nextData,
+      prevData: _.omit(prevData, "children"),
+      nextData: _.omit(nextData, "children"),
       nodeId: this._rootNodeID,
       timestamp: new Date()
     });
