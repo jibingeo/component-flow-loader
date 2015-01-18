@@ -49,7 +49,25 @@ var DataLogItem = React.createClass({
 
     return (
       <div className="cfl_data-log-item" onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
-        <h3>{this.props.componentName + " -  OWNED BY: " + this.props.ownerName + " - " +  this.props.nodeId + " - " + this.props.timestamp + " - " + this.props.lifecyclePhase}</h3>
+        <header className="cfl_data-log-item-header">
+          <h2>{this.props.componentName}</h2>
+          <div className="cfl_dl">
+            <span className="cfl_dt">Parent</span>
+            <span className="cfl_dd">{this.props.ownerName}</span>
+          </div>
+          <div className="cfl_dl">
+            <span className="cfl_dt">Node</span>
+            <span className="cfl_dd">{this.props.nodeId}</span>
+          </div>
+          <div className="cfl_dl">
+            <span className="cfl_dt">Time</span>
+            <span className="cfl_dd">{this.props.timestamp}</span>
+          </div>
+          <div className="cfl_dl">
+            <span className="cfl_dt">Lifecycle</span>
+            <span className="cfl_dd">{this.props.lifecyclePhase}</span>
+          </div>
+        </header>
         <pre>
           {diff.map(function(e){
             if(e.removed){

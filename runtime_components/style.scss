@@ -6,6 +6,12 @@ $red-background: #fadad7;
 $green: #406619;
 $green-background: #eaf2c2;
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // WRAPPER
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,18 +55,17 @@ $green-background: #eaf2c2;
 }
 
 .cfl_data-log-panel.cfl_hide-panel {
-  transform: translateX(100%);
   box-shadow: none;
+  transform: translateX(100%);
 }
 
 .cfl_scroll-container {
-  position: absolute;
-  padding: 1em;
-  top: 0;
-  left: 0;
-  right: 0;
   bottom: 0;
+  left: 0;
   overflow: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 
 .cfl_panel-toggle {
@@ -85,15 +90,51 @@ $green-background: #eaf2c2;
   color: initial;
 }
 
+.cfl_data-log-item {
+  padding: 1em;
+}
+
+.cfl_data-log-item-header {
+  margin-bottom: 1em;
+}
+
+.cfl_dl {
+  padding-top: 0.5em
+}
+
+.cfl_dt {
+  color: #999;
+  display: inline-block;
+  font-size: 0.75em;
+  padding-right: 1em;
+  text-align: right;
+  text-transform: uppercase;
+  width: 20%;
+}
+
+.cfl_dd {
+  overflow: auto;
+}
+
+.cfl_data-log-item ~ .cfl_data-log-item {
+  border-top: 1px solid #ccc;
+}
+
 .cfl_data-log-panel pre {
+  background-color: #f7f7f7;
+  border-radius: 3px;
   color: #333;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
+  overflow: auto;
+  padding: 0.5em;
+  width: 100%;
 }
 
 .cfl_data-log-panel pre del {
   background-color: $red-background;
   color: $red;
+  display: block;
   text-decoration: none;
 }
 
