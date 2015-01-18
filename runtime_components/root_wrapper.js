@@ -5,7 +5,7 @@ var React = require('react');
 var DataLogPanel = require('./data_log_panel');
 
 
-require('!style!css!./style.css');
+require('!style!css!sass!autoprefixer!./style.scss');
 
 var RotateWrapper = React.createClass({
 
@@ -62,22 +62,22 @@ var RotateWrapper = React.createClass({
 
     return (
       <div>
-        <div className={this.state.is3DView ? "viewport" : null}>
-          <div className="rotate-wrapper" style={this.state.is3DView ? transformString: null}>
+        <div className={this.state.is3DView ? "cfl_viewport" : null}>
+          <div className="cfl_rotate-wrapper" style={this.state.is3DView ? transformString: null}>
             {this.props.children}
           </div>
         </div>
 
-        <div className="rotate-controls">
+        <div className="cfl_rotate-controls">
           {this.state.is3DView ?
           <div>
-            <button onClick={this.toggleViewMode} className="toggle-view"> Toggle 2d View </button>
-            <button className="left" onMouseDown={this.handleIncrementThetaY}> Left </button>
-            <button className="right" onMouseDown={this.handleDecrementThetaY}> Right </button>
-            <button className="back" onMouseDown={this.handleDecrementZ}> Back </button>
-            <button className="forward" onMouseDown={this.handleIncrementZ}> Forward </button>
+            <button onClick={this.toggleViewMode} className="cfl_toggle-view"> Toggle 2d View </button>
+            <button className="cfl_left" onMouseDown={this.handleIncrementThetaY}> Left </button>
+            <button className="cfl_right" onMouseDown={this.handleDecrementThetaY}> Right </button>
+            <button className="cfl_back" onMouseDown={this.handleDecrementZ}> Back </button>
+            <button className="cfl_forward" onMouseDown={this.handleIncrementZ}> Forward </button>
           </div>
-            : <button className="toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
+            : <button className="cfl_toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
 
         <DataLogPanel />

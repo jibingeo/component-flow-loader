@@ -1,0 +1,147 @@
+$blue: #0074D9;
+
+$red: #b30000;
+$red-background: #fadad7;
+
+$green: #406619;
+$green-background: #eaf2c2;
+
+////////////////////////////////////////////////////////////////////////////////
+// WRAPPER
+////////////////////////////////////////////////////////////////////////////////
+
+.cfl_viewport {
+  perspective-origin-x: 50% 200px;
+  perspective: 700px;
+}
+
+.cfl_rotate-wrapper {
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+}
+
+.cfl_component-wrapper {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s ease;
+}
+
+.cfl_component-wrapper.cfl_changed {
+    box-shadow: inset 0 0 0 3px $red;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// PANEL
+////////////////////////////////////////////////////////////////////////////////
+
+.cfl_data-log-panel {
+  background-color: white;
+  border-left: 1px solid;
+  border-color: #ccc;
+  bottom: 0;
+  box-shadow: 0 0 10px rgba(black, 0.1);
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 25%;
+  z-index: 99999;
+}
+
+.cfl_data-log-panel.cfl_hide-panel {
+  transform: translateX(100%);
+  box-shadow: none;
+}
+
+.cfl_scroll-container {
+  position: absolute;
+  padding: 1em;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+}
+
+.cfl_panel-toggle {
+  $size: 3em;
+  background-color: inherit;
+  border: 1px solid;
+  border-color: inherit;
+  border-right: 0;
+  border-radius: 3px 0 0 3px;
+  color: #999;
+  cursor: pointer;
+  height: $size;
+  left: -($size);
+  line-height: $size;
+  position: absolute;
+  text-align: center;
+  top: 1em;
+  width: $size;
+}
+
+.cfl_panel-toggle:hover {
+  color: initial;
+}
+
+.cfl_data-log-panel pre {
+  color: #333;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
+}
+
+.cfl_data-log-panel pre del {
+  background-color: $red-background;
+  color: $red;
+  text-decoration: none;
+}
+
+.cfl_data-log-panel pre ins {
+  background-color: $green-background;
+  color: $green;
+  text-decoration: none;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// 3D CONTROLS
+////////////////////////////////////////////////////////////////////////////////
+
+.cfl_rotate-controls {
+  background: #fff;
+  bottom:30px;
+  height: 100px;
+  left:30px;
+  position: fixed;
+  width: 100px;
+}
+
+.cfl_left  {
+  left: 0;
+  position: absolute;
+  top: 40%;
+}
+
+.cfl_right  {
+  position: absolute;
+  right: 0;
+  top: 40%;
+}
+
+.cfl_forward  {
+  position: absolute;
+  right: 25%;
+  top: 0;
+}
+
+.cfl_back  {
+  bottom: 0;
+  position: absolute;
+  right: 33%;
+}
+
+.cfl_toggle-view {
+  left: 4%;
+  position: absolute;
+  top: -35%;
+}

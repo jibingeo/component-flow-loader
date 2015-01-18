@@ -1,6 +1,7 @@
 "use strict"
 
 var React = require('react/addons');
+var cx = React.addons.classSet;
 var _ = require('lodash');
 var jsDiff = require('diff');
 
@@ -47,7 +48,7 @@ var DataLogItem = React.createClass({
     }
 
     return (
-      <div className="data-log-item" onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
+      <div className="cfl_data-log-item" onMouseOver={this.handleMouseOver} onMouseOut={this.handleMouseOut}>
         <h3>{this.props.componentName + " -  OWNED BY: " + this.props.ownerName + " - " +  this.props.nodeId + " - " + this.props.timestamp + " - " + this.props.lifecyclePhase}</h3>
         <pre>
           {diff.map(function(e){
@@ -72,7 +73,8 @@ var DataLogItem = React.createClass({
 var DataLogPanel = React.createClass({
   getInitialState: function(){
     return{
-      dataLog: []
+      dataLog: [],
+      hidePanel: false
     }
   },
 
@@ -87,12 +89,26 @@ var DataLogPanel = React.createClass({
     this.setState({dataLog: log});
   },
 
+  handlePanelToggle: function(){
+    this.setState({hidePanel: !this.state.hidePanel});
+  },
+
   render: function () {
+    var panelClassName = cx({
+      "cfl_data-log-panel": true,
+      "cfl_hide-panel": this.state.hidePanel
+    });
+
     return (
-      <div className="data-log-panel" >
-        {this.state.dataLog.map(function(d, i){
-          return  <DataLogItem key={d.timestamp.getTime() / 1000} {... d} />;
-        })}
+      <div className={panelClassName}>
+        <div className="cfl_panel-toggle" onClick={this.handlePanelToggle}>
+          {this.state.hidePanel ? <span>&#10094;</span> : <span>&#10095;</span> }
+        </div>
+        <div className="cfl_scroll-container">
+          {this.state.dataLog.map(function(d, i){
+            return  <DataLogItem key={d.timestamp.getTime() / 1000} {... d} />;
+          })}
+        </div>
       </div>
     );
   }
