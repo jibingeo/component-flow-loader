@@ -116,8 +116,8 @@ var ComponentWrapper = React.createClass({
   render: function () {
 
     var wrapperClass = cx({
-        "component-wrapper": true,
-        "changed": this.state.didChange
+        "cfl_component-wrapper": true,
+        "cfl_changed": this.state.didChange
     });
 
     return (

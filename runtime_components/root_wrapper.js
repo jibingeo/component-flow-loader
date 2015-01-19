@@ -1,11 +1,12 @@
 "use strict"
 
 
-var React = require('react');
+var React = require('react/addons');
+var cx = React.addons.classSet;
 var DataLogPanel = require('./data_log_panel');
 
 
-require('!style!css!./style.css');
+require('!style!css!sass!autoprefixer!./style.scss');
 
 var RotateWrapper = React.createClass({
 
@@ -56,28 +57,31 @@ var RotateWrapper = React.createClass({
 
 
   render: function () {
-
-
     var transformString = {"transform": "rotatey(" + this.state.rotationVector[1] + "deg) translate3d("+ this.state.translationVector[0] +"px, "+ this.state.translationVector[1] +"px, "+ this.state.translationVector[2]+"px)"}
+    var rotateControlsClass = cx({
+      "cfl_rotate-controls": true,
+      "show-d-pad": this.state.is3DView
+    });
 
     return (
       <div>
-        <div className={this.state.is3DView ? "viewport" : null}>
-          <div className="rotate-wrapper" style={this.state.is3DView ? transformString: null}>
+        <div className={this.state.is3DView ? "cfl_viewport" : null}>
+          <div className="cfl_rotate-wrapper" style={this.state.is3DView ? transformString: null}>
             {this.props.children}
           </div>
         </div>
 
-        <div className="rotate-controls">
-          {this.state.is3DView ?
-          <div>
-            <button onClick={this.toggleViewMode} className="toggle-view"> Toggle 2d View </button>
-            <button className="left" onMouseDown={this.handleIncrementThetaY}> Left </button>
-            <button className="right" onMouseDown={this.handleDecrementThetaY}> Right </button>
-            <button className="back" onMouseDown={this.handleDecrementZ}> Back </button>
-            <button className="forward" onMouseDown={this.handleIncrementZ}> Forward </button>
+        <div className={rotateControlsClass}>
+          <a onClick={this.toggleViewMode} className="cfl_toggle-view">
+            {this.state.is3DView ? "2D" : "3D"}
+          </a>
+          <div className="cfl_d-pad">
+            <div className="cfl_3d-control cfl_back" onMouseDown={this.handleDecrementZ}>&#9650;</div>
+            <div className="cfl_3d-control cfl_forward" onMouseDown={this.handleIncrementZ}>&#9650;</div>
+            <div className="cfl_3d-control cfl_left" onMouseDown={this.handleIncrementThetaY}>&#9650;</div>
+            <div className="cfl_3d-control cfl_right" onMouseDown={this.handleDecrementThetaY}>&#9650;</div>
+            <div className="cfl_center">&#9711;</div>
           </div>
-            : <button className="toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
 
         <DataLogPanel />
