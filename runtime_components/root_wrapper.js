@@ -1,7 +1,8 @@
 "use strict"
 
 
-var React = require('react');
+var React = require('react/addons');
+var cx = React.addons.classSet;
 var DataLogPanel = require('./data_log_panel');
 
 
@@ -56,9 +57,11 @@ var RotateWrapper = React.createClass({
 
 
   render: function () {
-
-
     var transformString = {"transform": "rotatey(" + this.state.rotationVector[1] + "deg) translate3d("+ this.state.translationVector[0] +"px, "+ this.state.translationVector[1] +"px, "+ this.state.translationVector[2]+"px)"}
+    var rotateControlsClass = cx({
+      "cfl_rotate-controls": true,
+      "show-d-pad": this.state.is3DView
+    });
 
     return (
       <div>
@@ -68,16 +71,17 @@ var RotateWrapper = React.createClass({
           </div>
         </div>
 
-        <div className="cfl_rotate-controls">
-          {this.state.is3DView ?
-          <div>
-            <button onClick={this.toggleViewMode} className="cfl_toggle-view"> Toggle 2d View </button>
-            <button className="cfl_left" onMouseDown={this.handleIncrementThetaY}> Left </button>
-            <button className="cfl_right" onMouseDown={this.handleDecrementThetaY}> Right </button>
-            <button className="cfl_back" onMouseDown={this.handleDecrementZ}> Back </button>
-            <button className="cfl_forward" onMouseDown={this.handleIncrementZ}> Forward </button>
+        <div className={rotateControlsClass}>
+          <a onClick={this.toggleViewMode} className="cfl_toggle-view">
+            {this.state.is3DView ? "2D" : "3D"}
+          </a>
+          <div className="cfl_d-pad">
+            <div className="cfl_3d-control cfl_back" onMouseDown={this.handleDecrementZ}>&#9650;</div>
+            <div className="cfl_3d-control cfl_forward" onMouseDown={this.handleIncrementZ}>&#9650;</div>
+            <div className="cfl_3d-control cfl_left" onMouseDown={this.handleIncrementThetaY}>&#9650;</div>
+            <div className="cfl_3d-control cfl_right" onMouseDown={this.handleDecrementThetaY}>&#9650;</div>
+            <div className="cfl_center">&#9711;</div>
           </div>
-            : <button className="cfl_toggle-view" onClick={this.toggleViewMode}> Toggle 3d View </button>}
         </div>
 
         <DataLogPanel />

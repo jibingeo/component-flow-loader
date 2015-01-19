@@ -148,41 +148,97 @@ $green-background: #eaf2c2;
 // 3D CONTROLS
 ////////////////////////////////////////////////////////////////////////////////
 
+$control-size: 2em;
+
 .cfl_rotate-controls {
-  background: #fff;
-  bottom:30px;
-  height: 100px;
-  left:30px;
+  background-color: white;
+  bottom: -($control-size * 2 + 0.5em);
+  left: -($control-size * 2 + 0.5em);
   position: fixed;
-  width: 100px;
+  width: 6em;
+  box-sizing: content-box;
+  padding: 0.5em;
+  border-radius: 0 3px 0 0;
+  height: 6em;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #ccc, 0 0 10px rgba(black, 0.1);
 }
 
-.cfl_left  {
+.cfl_rotate-controls.show-d-pad {
+  bottom: 0;
   left: 0;
-  position: absolute;
-  top: 40%;
 }
 
-.cfl_right  {
-  position: absolute;
-  right: 0;
-  top: 40%;
+.cfl_d-pad {
+  position: relative;
 }
 
-.cfl_forward  {
+.cfl_3d-control,
+.cfl_center {
+  user-select: none;
+  color: #999;
+  text-align: center;
+  line-height: $control-size;
+  background-color: #444;
+  height: $control-size;
+  width: $control-size;
   position: absolute;
-  right: 25%;
+}
+
+.cfl_3d-control {
+  cursor: pointer;
+  border-radius: 3px 3px 0 0;
+}
+
+.cfl_3d-control:hover {
+  color: #f0f0f0;
+}
+
+.cfl_3d-control:active {
+  background-image: linear-gradient(to bottom, black, #444);
+}
+
+.cfl_center {
+  left: $control-size;
+  top: $control-size;
+}
+
+.cfl_back {
+  left: $control-size;
   top: 0;
 }
 
-.cfl_back  {
-  bottom: 0;
-  position: absolute;
-  right: 33%;
+.cfl_forward {
+  top: $control-size * 2;
+  left: $control-size;
+  transform: rotate(180deg);
+}
+
+.cfl_left {
+  top: $control-size;
+  transform: rotate(-90deg);
+}
+
+.cfl_right {
+  left: $control-size * 2;
+  top: $control-size;
+  transform: rotate(90deg);
 }
 
 .cfl_toggle-view {
-  left: 4%;
   position: absolute;
-  top: -35%;
+  width: $control-size;
+  line-height: $control-size;
+  display: inline-block;
+  right: 0;
+  top: 0;
+  font-weight: bold;
+  text-align: center;
+  color: $blue;
+}
+
+.cfl_toggle-view:hover {
+  background-color: $blue;
+  color: white;
+  text-decoration: none;
 }
