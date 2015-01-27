@@ -6,6 +6,8 @@ $red-background: #fadad7;
 $green: #406619;
 $green-background: #eaf2c2;
 
+$transition: all 0.2s ease-in-out;
+
 * {
   margin: 0;
   padding: 0;
@@ -21,19 +23,14 @@ $green-background: #eaf2c2;
   perspective: 700px;
 }
 
-.cfl_rotate-wrapper {
-  transform-style: preserve-3d;
-  transition: transform 0.8s ease;
-}
-
+.cfl_rotate-wrapper,
 .cfl_component-wrapper {
-  position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s ease;
+  transition: transform 0.8s ease-in-out;
 }
 
 .cfl_component-wrapper.cfl_changed {
-    box-shadow: inset 0 0 0 3px $red;
+  box-shadow: 0 0 0 2px $blue;
 }
 
 
@@ -50,6 +47,7 @@ $green-background: #eaf2c2;
   position: fixed;
   right: 0;
   top: 0;
+  transition: $transition;
   width: 25%;
   z-index: 99999;
 }
@@ -91,7 +89,13 @@ $green-background: #eaf2c2;
 }
 
 .cfl_data-log-item {
-  padding: 1em;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+
+.cfl_data-log-item:hover {
+  box-shadow: 0 0 0 1px $blue;
+  border-radius: 2px;
 }
 
 .cfl_data-log-item-header {
@@ -99,7 +103,7 @@ $green-background: #eaf2c2;
 }
 
 .cfl_dl {
-  padding-top: 0.5em
+  padding-top: 0.5em;
 }
 
 .cfl_dt {
@@ -110,14 +114,6 @@ $green-background: #eaf2c2;
   text-align: right;
   text-transform: uppercase;
   width: 20%;
-}
-
-.cfl_dd {
-  overflow: auto;
-}
-
-.cfl_data-log-item ~ .cfl_data-log-item {
-  border-top: 1px solid #ccc;
 }
 
 .cfl_data-log-panel pre {
@@ -152,16 +148,17 @@ $control-size: 2em;
 
 .cfl_rotate-controls {
   background-color: white;
-  bottom: -($control-size * 2 + 0.5em);
-  left: -($control-size * 2 + 0.5em);
-  position: fixed;
-  width: 6em;
-  box-sizing: content-box;
-  padding: 0.5em;
   border-radius: 0 3px 0 0;
-  height: 6em;
-  overflow: hidden;
+  bottom: -($control-size * 2 + 0.5em);
   box-shadow: 0 0 0 1px #ccc, 0 0 10px rgba(black, 0.1);
+  box-sizing: content-box;
+  height: 6em;
+  left: -($control-size * 2 + 0.5em);
+  overflow: hidden;
+  padding: 0.5em;
+  position: fixed;
+  transition: $transition;
+  width: 6em;
 }
 
 .cfl_rotate-controls.show-d-pad {
