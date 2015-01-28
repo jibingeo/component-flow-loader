@@ -20,8 +20,20 @@ function getEntryArray(entry) {
 
 module.exports = function (source) {
 
-  var resourcePath = this.resourcePath,
-    filename = path.basename(resourcePath);
+  var resourcePath = this.resourcePath;
+  var filename = path.basename(resourcePath);
+
+  //Parse out all potential app entry points
+  var entryPaths = !_.isPlainObject(this.options.entry) ?
+    getEntryArray(this.options.entry) :
+    _(this.options.entry).map(function (val, key) {
+      return getEntryArray(val);
+    }).flatten().value();
+
+  var isEntryModule = _.any(entryPaths, function (e) {
+    return resourcePath.indexOf(e.replace(".", "")) !== -1
+  });
+
 
   if (this.cacheable) {
     this.cacheable();
@@ -32,18 +44,6 @@ module.exports = function (source) {
     return source;
   }
 
-
-  //Parse out all potential app entry points
-  var entryPaths = !_.isPlainObject(this.options.entry) ?
-    getEntryArray(this.options.entry) :
-    _(this.options.entry).map(function (val, key) {
-      return getEntryArray(val);
-    }).flatten().value();
-
-
-  var isEntryModule = _.any(entryPaths, function (e) {
-    return resourcePath.indexOf(e.replace(".", "")) !== -1
-  });
 
   if(isEntryModule){
     console.log("Instrumenting entry module: ", filename);
