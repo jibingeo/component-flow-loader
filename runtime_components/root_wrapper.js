@@ -3,7 +3,7 @@
 
 var React = require('react/addons');
 var cx = React.addons.classSet;
-var DataLogPanel = require('./data_log_panel');
+var DataLogPanel = require('!jsx-loader!./data_log_panel');
 
 
 require('!style!css!sass!autoprefixer!./style.scss');
