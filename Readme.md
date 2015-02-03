@@ -2,6 +2,8 @@
 
 A webpack loader for the instrumentation and analysis of data flow in a React application.
 
+Used to demonstrate concepts from [my talk at React.js conf](http://conf.reactjs.com/schedule.html#unlocking-the-structure-of-your-react-applications-with-the-ast)
+
 
 
 
