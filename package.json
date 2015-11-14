@@ -16,7 +16,7 @@
     "esprima": "^1.2.2",
     "estraverse": "^1.9.0",
     "lodash": "^2.4.1",
-    "sass-loader": "^0.3.1",
+    "sass-loader": "^3.1.1",
     "style-loader": "^0.8.2",
     "jsx-loader": "^0.12.1"
   },
