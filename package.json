@@ -21,6 +21,6 @@
     "jsx-loader": "^0.12.1"
   },
   "peerDependencies": {
-    "react": "0.12.x"
+    "react": "0.14.x"
   }
 }
