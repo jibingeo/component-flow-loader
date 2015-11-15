@@ -1,9 +1,9 @@
 "use strict"
 
-var React = require('react/addons');
+var React = require('react');
 var _ = require('lodash');
 
-var cx = React.addons.classSet;
+var cx = require("classnames");
 
 var eventBus = require('./event_bus');
 
