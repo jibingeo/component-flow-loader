@@ -6,7 +6,7 @@ var cx = require('classnames');
 var DataLogPanel = require('!jsx-loader!./data_log_panel');
 
 
-require('!style!css!sass!autoprefixer!./style.scss');
+require('!style!css!autoprefixer!sass!./style.scss');
 
 var RotateWrapper = React.createClass({
 
