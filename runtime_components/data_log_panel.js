@@ -69,12 +69,12 @@ var DataLogItem = React.createClass({
           </div>
         </header>
         <pre>
-          {diff.map(function(e){
+          {diff.map(function(e, i){
             if(e.removed){
-              return <del>{e.value}</del>;
+              return <del key={i}>{e.value}</del>;
             }
             else if(e.added){
-              return <ins>{e.value}</ins>;
+              return <ins  key={i}>{e.value}</ins>;
             }
             else{
               return e.value;
@@ -124,7 +124,7 @@ var DataLogPanel = React.createClass({
         </div>
         <div className="cfl_scroll-container">
           {this.state.dataLog.map(function(d, i){
-            return  <DataLogItem key={d.timestamp.getTime() / 1000} {... d} />;
+            return  <DataLogItem key={i} {... d} />;
           })}
         </div>
       </div>
