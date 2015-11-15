@@ -78,16 +78,16 @@ var ComponentWrapper = React.createClass({
     eventBus.emit("data", {
       lifecyclePhase: lifecyclePhase,
       componentName: React.Children.only(this.props.children).type.displayName,
-      ownerName: this._owner.constructor.displayName,
+      ownerName: this._reactInternalInstance._currentElement._owner.getName(),
       prevData: _.omit(prevData, "children"),
       nextData: _.omit(nextData, "children"),
-      nodeId: this._rootNodeID,
+      nodeId: this._reactInternalInstance._rootNodeID,
       timestamp: new Date()
     });
   },
 
   _onLogItemMouseOver: function (nodeid) {
-    if (this._rootNodeID === nodeid) {
+    if (this._reactInternalInstance._rootNodeID === nodeid) {
       if (this.isMounted()) {
         this.setState({didChange: true});
       }
@@ -95,7 +95,7 @@ var ComponentWrapper = React.createClass({
   },
 
   _onLogItemMouseOut: function (nodeid) {
-    if (this._rootNodeID === nodeid) {
+    if (this._reactInternalInstance._rootNodeID === nodeid) {
       if (this.isMounted()) {
         this.setState({didChange: false, border: null});
       }
