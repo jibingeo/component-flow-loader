@@ -61,7 +61,7 @@ var DataLogItem = React.createClass({
           </div>
           <div className="cfl_dl">
             <span className="cfl_dt">Time</span>
-            <span className="cfl_dd">{this.props.timestamp}</span>
+            <span className="cfl_dd">{this.props.timestamp.toString()}</span>
           </div>
           <div className="cfl_dl">
             <span className="cfl_dt">Lifecycle</span>
