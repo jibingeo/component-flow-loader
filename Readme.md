@@ -15,7 +15,7 @@ Used to demonstrate concepts from [my talk at React.js conf](http://conf.reactjs
 Add the following entry to your `package.json`  (TODO: Publish to npm)
 
 ```
- "component-flow-loader": "git+ssh://git@github.com:gurdasnijor/component-flow-loader.git"
+ "component-flow-loader": "git+https://git@github.com/gurdasnijor/component-flow-loader.git"
 ```
 
 
